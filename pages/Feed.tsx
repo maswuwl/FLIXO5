@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import VideoCard from '../components/VideoCard';
 import { MOCK_FEED, MOCK_USERS } from '../constants';
-import { Sparkles, Cpu, Brain, Info, BarChart, Zap, Search } from 'lucide-react';
+import { Brain, Search, BarChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { recommendationEngine } from '../services/recommendationService';
 import ProfileGuard from '../components/ProfileGuard';
@@ -36,14 +36,14 @@ const Feed: React.FC = () => {
           <div className="w-20 h-20 bg-pink-500/20 rounded-full flex items-center justify-center mb-6 border border-pink-500/30 animate-pulse">
             <Brain size={40} className="text-pink-500" />
           </div>
-          <h2 className="text-2xl font-black mb-2 italic">رؤية الخوارزمية لك</h2>
+          <h2 className="text-2xl font-black mb-2 italic text-white">رؤية الخوارزمية لك</h2>
           <p className="text-pink-400 font-bold mb-8 text-center px-6">"{userPersona}"</p>
           
           <div className="w-full space-y-4 max-w-xs">
             <p className="text-[10px] text-gray-500 uppercase font-black text-center tracking-widest">أكثر ما لفت انتباهك:</p>
             <div className="flex flex-wrap justify-center gap-2">
               {recommendationEngine.getTopTags().map(tag => (
-                <span key={tag} className="bg-white/5 border border-white/10 px-4 py-2 rounded-2xl text-xs font-bold">#{tag}</span>
+                <span key={tag} className="bg-white/5 border border-white/10 px-4 py-2 rounded-2xl text-xs font-bold text-white">#{tag}</span>
               ))}
             </div>
           </div>
@@ -55,13 +55,12 @@ const Feed: React.FC = () => {
       <div className="fixed top-20 right-6 z-[95] flex flex-col items-center space-y-4">
         <button 
           onClick={() => navigate('/explore')}
-          className="p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl active:scale-90 transition-all hover:bg-white/20 text-white"
+          className="p-4 bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl active:scale-90 transition-all hover:bg-white/10 text-white"
         >
           <Search size={24} />
         </button>
 
         <div className="flex flex-col space-y-3">
-          {/* زر الملف الشخصي المحسن مع درع الحماية للسيادة */}
           <button 
             onClick={() => navigate('/profile')} 
             className="group relative active:scale-90 transition-all"

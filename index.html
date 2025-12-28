@@ -17,11 +17,23 @@
             --flixo-purple: #7C3AED;
             --flixo-pink: #EC4899;
             --flixo-orange: #F59E0B;
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
         }
+        
+        .light-mode {
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.05);
+        }
+
         body {
             font-family: 'Cairo', 'Inter', sans-serif;
-            background-color: #000;
-            color: #fff;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -29,8 +41,14 @@
             -webkit-tap-highlight-color: transparent;
             height: 100vh;
             width: 100vw;
-            touch-action: manipulation;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+        
+        #root {
+            height: 100vh;
+            width: 100vw;
+        }
+
         .video-snap-container {
             scroll-snap-type: y mandatory;
             overflow-y: scroll;
@@ -65,7 +83,6 @@
             display: inline-block;
             animation: danceSlow 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
         }
-        /* حركة العلامة المائية الشاملة في كل زوايا الشاشة */
         @keyframes likeeMove {
             0% { top: 12%; left: 8%; opacity: 0.8; }
             25% { top: 12%; left: 65%; opacity: 1; }
@@ -81,8 +98,8 @@
             filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
         }
         @keyframes logoPulse {
-            0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 5px var(--flixo-pink)); }
-            50% { transform: scale(1.25); filter: brightness(1.4) drop-shadow(0 0 20px var(--flixo-pink)); }
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.25); filter: brightness(1.4); }
         }
         .logo-pulse {
             animation: logoPulse 2s ease-in-out infinite;
@@ -134,6 +151,7 @@
         </div>
     </div>
     <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
     <script>
         window.addEventListener('load', () => {
             setTimeout(() => {
