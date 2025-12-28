@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FLIXO - المنصة الذكية</title>
+    <title>FLIXO - السيادة اليمانية</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,137 +19,90 @@
             --flixo-orange: #F59E0B;
             --bg-color: #000000;
             --text-color: #ffffff;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --yemen-red: #CE1126;
+            --yemen-white: #FFFFFF;
+            --yemen-black: #000000;
         }
         
-        .light-mode {
-            --bg-color: #f8fafc;
-            --text-color: #0f172a;
-            --card-bg: #ffffff;
-            --border-color: rgba(0, 0, 0, 0.05);
-        }
-
         body {
             font-family: 'Cairo', 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            height: 100vh;
-            width: 100vw;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        #root {
-            height: 100vh;
-            width: 100vw;
+            margin: 0; padding: 0; overflow: hidden;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+            height: 100vh; width: 100vw;
         }
 
-        .video-snap-container {
-            scroll-snap-type: y mandatory;
-            overflow-y: scroll;
-            height: 100vh;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+        .yemen-flag-bar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(to right, #CE1126 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #000000 66.6%);
+            z-index: 10001;
         }
-        .video-snap-item {
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            height: 100vh;
-            width: 100%;
+
+        #splash-screen {
+            position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.8s ease;
+            background-color: black;
+            overflow: hidden;
         }
-        ::-webkit-scrollbar {
-            display: none;
+
+        .splash-content {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            animation: zoomIn 1s ease-out;
         }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
         .flixo-gradient {
             background: linear-gradient(45deg, var(--flixo-purple), var(--flixo-pink), var(--flixo-orange));
-            background-size: 200% 200%;
-            animation: gradientMove 5s ease infinite;
         }
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes danceSlow {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            50% { transform: translateY(-10px) rotate(4deg) scale(1.15); }
-        }
-        .dancing-letter {
-            display: inline-block;
-            animation: danceSlow 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-        }
-        @keyframes likeeMove {
-            0% { top: 12%; left: 8%; opacity: 0.8; }
-            25% { top: 12%; left: 65%; opacity: 1; }
-            50% { top: 65%; left: 65%; opacity: 0.8; }
-            75% { top: 65%; left: 8%; opacity: 1; }
-            100% { top: 12%; left: 8%; opacity: 0.8; }
-        }
-        .likee-watermark-container {
-            position: absolute;
-            animation: likeeMove 20s linear infinite;
-            z-index: 100;
-            pointer-events: none;
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
-        }
-        @keyframes logoPulse {
-            0%, 100% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.25); filter: brightness(1.4); }
-        }
-        .logo-pulse {
-            animation: logoPulse 2s ease-in-out infinite;
-        }
-        .flixo-text-gradient {
-            background: linear-gradient(45deg, var(--flixo-purple), var(--flixo-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        #splash-screen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease-out, visibility 0.8s;
-        }
-        #splash-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
+
+        #splash-screen.hidden { opacity: 0; pointer-events: none; }
+
+        .sovereign-copyright {
+            position: fixed; bottom: 40px; width: 100%; text-align: center;
+            font-size: 8px; font-weight: 900; color: rgba(255,255,255,0.1);
+            letter-spacing: 0.5em; text-transform: uppercase; pointer-events: none; z-index: 5;
         }
     </style>
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@^19.2.3",
-        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-        "react/": "https://esm.sh/react@^19.2.3/",
-        "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-        "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-        "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0"
-      }
-    }
-    </script>
+<script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
 </head>
 <body>
+    <div class="yemen-flag-bar"></div>
     <div id="splash-screen">
-        <div style="display: flex; flex-direction: column; align-items: center;">
-            <div class="w-24 h-24 flixo-gradient rounded-[2.5rem] flex items-center justify-center animate-logo-pulse mb-6 rotate-12 shadow-[0_0_60px_rgba(124,58,237,0.7)]">
+        <div class="splash-content">
+            <div class="w-24 h-24 flixo-gradient rounded-[2.5rem] flex items-center justify-center mb-6 mx-auto rotate-12 shadow-[0_0_80px_rgba(124,58,237,0.6)]">
                 <span style="font-family: 'Inter'; font-weight: 900; font-size: 3rem; color: white;">FX</span>
             </div>
-            <h1 class="text-5xl font-black italic tracking-tighter flixo-text-gradient">FLIXO</h1>
-            <div class="mt-8 flex flex-col items-center">
-                <div class="h-[1.5px] w-24 bg-gradient-to-r from-transparent via-gray-400 to-transparent mb-4"></div>
-                <p class="text-[11px] text-gray-400 font-black uppercase tracking-[0.4em] opacity-80">Khalid Almontaser</p>
+            <h1 class="text-6xl font-black italic tracking-tighter text-white">FLIXO</h1>
+            <p class="mt-4 text-white/60 font-black uppercase tracking-[0.4em] text-[10px]">خالد المنتصر • السيادة اليمانية</p>
+            <div class="mt-12 flex flex-col items-center">
+                <div class="flex space-x-1 space-x-reverse mb-2">
+                    <div class="w-8 h-4 bg-[#CE1126]"></div>
+                    <div class="w-8 h-4 bg-white"></div>
+                    <div class="w-8 h-4 bg-black"></div>
+                </div>
             </div>
         </div>
     </div>
+    
+    <div class="sovereign-copyright">ابتكار يماني أصيل للمطور خالد المنتصر</div>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
     <script>
@@ -157,7 +110,7 @@
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.classList.add('hidden');
-            }, 2200);
+            }, 3000);
         });
     </script>
 </body>

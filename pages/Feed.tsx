@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import VideoCard from '../components/VideoCard';
 import { MOCK_FEED, MOCK_USERS } from '../constants';
-import { Brain, Search, BarChart } from 'lucide-react';
+import { Brain, Search, BarChart, Bell, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { recommendationEngine } from '../services/recommendationService';
 import ProfileGuard from '../components/ProfileGuard';
+import GlobalSearch from '../components/GlobalSearch';
 
 const Feed: React.FC = () => {
   const navigate = useNavigate();
@@ -51,16 +52,36 @@ const Feed: React.FC = () => {
         </div>
       )}
 
-      {/* FIXED TOP RIGHT CONTROLS */}
-      <div className="fixed top-20 right-6 z-[95] flex flex-col items-center space-y-4">
-        <button 
-          onClick={() => navigate('/explore')}
-          className="p-4 bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl active:scale-90 transition-all hover:bg-white/10 text-white"
-        >
-          <Search size={24} />
-        </button>
+      {/* EXTREME TOP CONTROLS */}
+      {/* Menu at Absolute Top Left (Corner) */}
+      <div className="fixed top-4 left-4 z-[160]">
+         <button 
+           onClick={() => {
+              const sidebarBtn = document.getElementById('sidebar-toggle-btn');
+              if (sidebarBtn) sidebarBtn.click();
+           }} 
+           className="p-3 bg-black/40 backdrop-blur-xl border border-white/20 rounded-2xl text-white shadow-2xl active:scale-90 transition-all hover:bg-white/10"
+         >
+           <Menu size={22} />
+         </button>
+      </div>
 
+      {/* Search at Absolute Top Right (Corner) */}
+      <div className="fixed top-4 right-4 z-[160]">
+        <GlobalSearch />
+      </div>
+
+      {/* Right Controls Stack */}
+      <div className="fixed top-32 right-6 z-[95] flex flex-col items-center space-y-4">
         <div className="flex flex-col space-y-3">
+          <button 
+            onClick={() => navigate('/notifications')} 
+            className="p-3 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 text-white relative active:scale-90 transition-all"
+          >
+            <Bell size={22} />
+            <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-pink-500 rounded-full border-2 border-black animate-pulse"></div>
+          </button>
+
           <button 
             onClick={() => navigate('/profile')} 
             className="group relative active:scale-90 transition-all"
@@ -82,12 +103,12 @@ const Feed: React.FC = () => {
       </div>
 
       {/* Top Header Navigation Tabs */}
-      <div className="absolute top-0 left-0 right-0 z-[80] bg-gradient-to-b from-black/95 via-black/40 to-transparent pt-24 pb-10">
+      <div className="absolute top-0 left-0 right-0 z-[80] bg-gradient-to-b from-black/95 via-black/30 to-transparent pt-20 pb-10">
         <div className="flex justify-center space-x-8 space-x-reverse pointer-events-auto">
-          <button onClick={() => setActiveTab('following')} className={`text-lg font-black tracking-tighter transition-all ${activeTab === 'following' ? 'text-white scale-105' : 'text-white/40'}`}>أتابعهم</button>
-          <button onClick={() => setActiveTab('for-you')} className={`text-lg font-black tracking-tighter transition-all ${activeTab === 'for-you' ? 'text-white scale-110 relative' : 'text-white/40'}`}>
+          <button onClick={() => setActiveTab('following')} className={`text-base font-black tracking-tighter transition-all ${activeTab === 'following' ? 'text-white scale-105' : 'text-white/40'}`}>أتابعهم</button>
+          <button onClick={() => setActiveTab('for-you')} className={`text-base font-black tracking-tighter transition-all ${activeTab === 'for-you' ? 'text-white scale-110 relative' : 'text-white/40'}`}>
             لك
-            {activeTab === 'for-you' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-pink-500 rounded-full shadow-[0_0_10px_rgba(236,72,153,0.8)]"></div>}
+            {activeTab === 'for-you' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-pink-500 rounded-full shadow-[0_0_10px_rgba(236,72,153,0.8)]"></div>}
           </button>
         </div>
       </div>
@@ -99,7 +120,7 @@ const Feed: React.FC = () => {
       </div>
 
       {isTuning && (
-        <div className="absolute bottom-28 left-6 z-[85] flex items-center bg-indigo-600/90 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl text-[10px] font-black italic shadow-2xl animate-bounce border border-white/20">
+        <div className="absolute bottom-28 left-6 z-[85] flex items-center bg-indigo-600/90 backdrop-blur-md text-white px-4 py-2 rounded-2xl text-[9px] font-black italic shadow-2xl animate-bounce border border-white/20">
           <BarChart size={12} className="ml-2" /> جاري تحسين محتواك...
         </div>
       )}

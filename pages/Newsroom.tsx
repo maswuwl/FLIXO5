@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Newspaper, Zap, Brain, Globe, ChevronLeft, Sparkles, TrendingUp, Search } from 'lucide-react';
+import { Newspaper, Zap, Brain, Globe, ChevronLeft, Sparkles, TrendingUp, Search, Volume2, Mic2 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 
 const Newsroom: React.FC = () => {
   const [analyzing, setAnalyzing] = useState<string | null>(null);
+  const [isBroadcasting, setIsBroadcasting] = useState<string | null>(null);
   const [news, setNews] = useState([
-    { id: '1', title: 'ثورة في عالم الذكاء الاصطناعي التوليدي', category: 'تكنولوجيا', summary: 'إطلاق نماذج جديدة قادرة على فهم المشاعر البشرية بعمق.', timestamp: 'منذ ساعتين' },
-    { id: '2', title: 'النمو الاقتصادي الرقمي يتجاوز التوقعات', category: 'اقتصاد', summary: 'ارتفاع كبير في قيمة الأصول الرقمية وصناعة المحتوى.', timestamp: 'منذ 4 ساعات' }
+    { id: '1', title: 'ثورة في عالم الذكاء الاصطناعي التوليدي', category: 'تكنولوجيا', summary: 'إطلاق نماذج جديدة قادرة على فهم المشاعر البشرية بعمق، مما يفتح آفاقاً جديدة في التفاعل بين الإنسان والآلة.', timestamp: 'منذ ساعتين' },
+    { id: '2', title: 'النمو الاقتصادي الرقمي يتجاوز التوقعات', category: 'اقتصاد', summary: 'ارتفاع كبير في قيمة الأصول الرقمية وصناعة المحتوى، حيث أصبحت المنصات الترفيهية المحرك الأول للاقتصاد الحديث.', timestamp: 'منذ 4 ساعات' }
   ]);
   const [selectedAnalysis, setSelectedAnalysis] = useState<Record<string, string>>({});
 
@@ -16,6 +17,12 @@ const Newsroom: React.FC = () => {
     const result = await geminiService.analyzeNews(topic);
     setSelectedAnalysis(prev => ({ ...prev, [id]: result }));
     setAnalyzing(null);
+  };
+
+  const handleBroadcast = async (item: typeof news[0]) => {
+    setIsBroadcasting(item.id);
+    await geminiService.speakNews(`${item.title}. ${item.summary}`);
+    setTimeout(() => setIsBroadcasting(null), 3000); // UI indicator reset
   };
 
   return (
@@ -33,11 +40,24 @@ const Newsroom: React.FC = () => {
 
       <div className="space-y-6">
         {news.map((item) => (
-          <div key={item.id} className="bg-white/5 border border-white/10 rounded-[35px] p-6 hover:border-indigo-500/30 transition-all">
+          <div key={item.id} className="bg-white/5 border border-white/10 rounded-[35px] p-6 hover:border-indigo-500/30 transition-all relative overflow-hidden group">
+            {isBroadcasting === item.id && (
+              <div className="absolute top-0 right-0 left-0 h-1 bg-indigo-500 shadow-[0_0_10px_rgba(79,70,229,1)] animate-pulse"></div>
+            )}
+            
             <div className="flex justify-between items-start mb-4">
               <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full font-black uppercase tracking-widest">{item.category}</span>
-              <span className="text-[10px] text-gray-500 font-bold">{item.timestamp}</span>
+              <div className="flex items-center space-x-3 space-x-reverse">
+                <button 
+                  onClick={() => handleBroadcast(item)}
+                  className={`p-2 rounded-xl border transition-all ${isBroadcasting === item.id ? 'bg-indigo-500 border-indigo-500 text-white animate-pulse' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'}`}
+                >
+                  <Volume2 size={16} />
+                </button>
+                <span className="text-[10px] text-gray-500 font-bold">{item.timestamp}</span>
+              </div>
             </div>
+            
             <h3 className="text-lg font-black mb-3 leading-tight">{item.title}</h3>
             <p className="text-xs text-gray-400 leading-relaxed mb-6">{item.summary}</p>
             
@@ -69,10 +89,11 @@ const Newsroom: React.FC = () => {
         ))}
       </div>
       
-      <div className="mt-12 p-8 bg-gradient-to-r from-yellow-900/20 to-black border border-yellow-500/20 rounded-[40px] text-center">
-         <Sparkles className="text-yellow-500 mx-auto mb-4" size={32} />
-         <h4 className="text-xl font-black italic mb-2 text-yellow-500">ميزة قادمة للمبدعين</h4>
-         <p className="text-xs text-gray-400 font-bold">بث مباشر للأخبار العالمية مع تعليق "خبير فليكسو" الصوتي فوراً.</p>
+      <div className="mt-12 p-8 bg-gradient-to-r from-yellow-900/20 to-black border border-yellow-500/20 rounded-[40px] text-center relative overflow-hidden">
+         <div className="absolute inset-0 opacity-10 bg-[url('https://api.dicebear.com/7.x/shapes/svg?seed=news_bg')] bg-cover"></div>
+         <Sparkles className="text-yellow-500 mx-auto mb-4 relative z-10" size={32} />
+         <h4 className="text-xl font-black italic mb-2 text-yellow-500 relative z-10">البث الصوتي المباشر</h4>
+         <p className="text-xs text-gray-400 font-bold relative z-10">اضغط على أيقونة الصوت لسماع الخبر بصوت مذيعنا الذكي "Kore".</p>
       </div>
     </div>
   );

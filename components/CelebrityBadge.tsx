@@ -44,24 +44,31 @@ const tierConfig = {
 const CelebrityBadge: React.FC<CelebrityBadgeProps> = ({ tier, size = 16 }) => {
   const config = tierConfig[tier];
 
-  // للسيادة: إشارة ذهبية مشعة فقط
+  // Sovereign Tier (0) - Gold
   if (tier === 0) {
+    // Cast to specific tier 0 configuration to fix property access errors in the union
+    const c = config as { icon: React.ReactElement; shadow: string; animate: string };
     return (
-      <div className={`relative inline-flex items-center justify-center ${config.shadow} ${config.animate}`}>
+      <div className={`relative inline-flex items-center justify-center ${c.shadow} ${c.animate}`}>
         <div className="absolute inset-0 bg-yellow-400 blur-md opacity-20 animate-pulse"></div>
-        {React.cloneElement(config.icon as React.ReactElement, { size: size + 8 })}
+        {/* Cast icon to allow size prop in cloneElement to pass TypeScript checks */}
+        {React.cloneElement(c.icon as React.ReactElement<{ size?: number }>, { size: size + 8 })}
         <Sparkles size={10} className="absolute -top-1 -right-1 text-white animate-bounce opacity-80" />
       </div>
     );
   }
 
+  // Tiers 1-5 - Gradient badges
+  // Cast to standard tier configuration to fix property access errors in the union
+  const c = config as { gradient: string; icon: React.ReactElement; label: string };
   return (
-    <div className={`flex items-center space-x-1 space-x-reverse bg-gradient-to-r ${config.gradient} px-2.5 py-1 rounded-lg shadow-lg border border-white/20 animate-fade-in`}>
+    <div className={`flex items-center space-x-1 space-x-reverse bg-gradient-to-r ${c.gradient} px-2.5 py-1 rounded-lg shadow-lg border border-white/20 animate-fade-in`}>
       <div className="text-white">
-        {React.cloneElement(config.icon as React.ReactElement, { size: size - 2 })}
+        {/* Cast icon to allow size prop in cloneElement to pass TypeScript checks */}
+        {React.cloneElement(c.icon as React.ReactElement<{ size?: number }>, { size: size - 2 })}
       </div>
       <span className="text-[10px] font-black text-white uppercase tracking-tighter whitespace-nowrap">
-        {config.label}
+        {c.label}
       </span>
     </div>
   );

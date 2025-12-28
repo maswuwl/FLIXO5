@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Feed from './pages/Feed';
@@ -13,19 +13,32 @@ import FriendsNearby from './pages/FriendsNearby';
 import ChessArena from './pages/ChessArena';
 import Newsroom from './pages/Newsroom';
 import Vault from './pages/Vault';
-
-const ComingSoon = () => (
-  <div className="h-full flex flex-col items-center justify-center p-10 text-center bg-black">
-    <div className="w-20 h-20 flixo-gradient rounded-3xl flex items-center justify-center mb-6 animate-pulse">
-      <span className="text-white font-black text-4xl">!</span>
-    </div>
-    <h2 className="text-2xl font-black italic mb-2">قريباً جداً</h2>
-    <p className="text-gray-500 text-sm">هذه الميزة في مرحلة التطوير النهائي بمختبرات فليكسو.</p>
-    <button onClick={() => window.history.back()} className="mt-8 text-pink-500 font-black uppercase tracking-widest text-xs">العودة</button>
-  </div>
-);
+import Auth from './pages/Auth';
+import Settings from './pages/Settings';
+import AdminDashboard from './pages/AdminDashboard';
+import Notifications from './pages/Notifications';
+import Wallet from './pages/Wallet';
+import AIBuddy from './pages/AIBuddy';
+import Blueprint from './pages/Blueprint';
+import Community from './pages/Community';
+import Ports from './pages/Ports';
+import Charter from './pages/Charter';
+import SovereignStocks from './pages/SovereignStocks';
+import DigitalIdentity from './pages/DigitalIdentity';
+import { authService } from './services/authService';
 
 const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
+  const currentUser = authService.getCurrentUser();
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  if (!isAuthenticated) {
+    return <Auth onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <Router>
       <Layout>
@@ -34,14 +47,26 @@ const App: React.FC = () => {
           <Route path="/explore" element={<Explore />} />
           <Route path="/create" element={<Create />} />
           <Route path="/inbox" element={<Inbox />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/nearby" element={<FriendsNearby />} />
           <Route path="/chess" element={<ChessArena />} />
           <Route path="/newsroom" element={<Newsroom />} />
           <Route path="/vault" element={<Vault />} />
           <Route path="/ai-studio" element={<AIStudio />} />
+          <Route path="/wallet" element={<Wallet />} />
+          <Route path="/stocks" element={<SovereignStocks />} />
+          <Route path="/identity" element={<DigitalIdentity />} />
+          <Route path="/ai-buddy" element={<AIBuddy />} />
+          <Route path="/blueprint" element={<Blueprint />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/ports" element={<Ports />} />
+          <Route path="/charter" element={<Charter />} />
           <Route path="/market" element={<Market />} />
-          <Route path="/settings" element={<ComingSoon />} />
+          <Route path="/settings" element={<Settings />} />
+          {currentUser?.celebrityTier === 0 && (
+            <Route path="/admin" element={<AdminDashboard />} />
+          )}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

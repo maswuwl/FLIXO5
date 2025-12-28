@@ -1,31 +1,5 @@
 
-export interface NewsItem {
-  id: string;
-  title: string;
-  category: string;
-  summary: string;
-  aiCommentary: string;
-  timestamp: string;
-  sourceUrl?: string;
-}
-
-export interface AuctionItem {
-  id: string;
-  name: string;
-  currentBid: number;
-  highestBidder: string;
-  endTime: string;
-  image: string;
-}
-
-export interface SocialLinks {
-  youtube?: string;
-  instagram?: string;
-  telegram?: string;
-  snapchat?: string;
-  externalWebsite?: string;
-}
-
+// Add missing types for the FLIXO ecosystem
 export type CelebrityColorTier = 0 | 1 | 2 | 3 | 4 | 5;
 
 export interface User {
@@ -40,34 +14,15 @@ export interface User {
   likes: number;
   isVerified: boolean;
   isPlatformChannel?: boolean;
-  socialLinks?: SocialLinks;
+  celebrityTier: CelebrityColorTier;
   referralCode?: string;
-  earnedCoins?: number;
-  celebrityTier?: CelebrityColorTier;
-  lastShareDate?: string;
-  subscriptionType?: 'monthly' | '3months' | '6months' | 'yearly' | '3years';
-}
-
-export interface ChessMatch {
-  id: string;
-  playerWhite: User;
-  playerBlack: User | 'AI_SYSTEM';
-  spectators: number;
-  boardState: string;
-  status: 'active' | 'finished';
-}
-
-export interface Gift {
-  id: string;
-  name: string;
-  icon: string;
-  price: number;
-  type: 'static' | 'animated' | '3d';
+  isGuest?: boolean;
+  hasPremiumWatermark?: boolean;
 }
 
 export interface ContentItem {
   id: string;
-  type: 'video' | 'post' | 'live';
+  type: 'video' | 'image' | 'text';
   author: User;
   content: string;
   mediaUrl?: string;
@@ -76,7 +31,63 @@ export interface ContentItem {
   shares: number;
   saves: number;
   timestamp: string;
-  tags?: string[];
-  isLive?: boolean;
   isFeaturedByPlatform?: boolean;
+  tags?: string[];
+}
+
+export interface CommunityCircle {
+  id: string;
+  name: string;
+  description: string;
+  membersCount: number;
+  tierRequired: number;
+  icon: string;
+}
+
+export interface Memo {
+  id: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  category: 'technical' | 'strategic' | 'ui' | 'general';
+  status: 'pending' | 'discussing' | 'implemented' | 'archived';
+  aiAnalysis: string;
+  priority: 'low' | 'medium' | 'high';
+  timestamp: string;
+  expiresAt?: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  status: 'draft' | 'in-progress' | 'completed' | 'on-hold';
+  aiFeedback: string;
+  timeline: { stage: string; date: string; completed: boolean }[];
+  createdAt: string;
+  buildRatio: number;
+  errorRate: number;
+}
+
+export interface PlatformStats {
+  activeUsers: number;
+  dailyEngagement: string;
+  serverStatus: 'stable' | 'warning' | 'critical';
+  pendingUpdates: number;
+  isAutoModActive: boolean;
+}
+
+export interface Gift {
+  id: string;
+  name: string;
+  icon: string;
+  price: number;
+  type: 'static' | '3d' | 'animated';
+}
+
+export interface SystemLog {
+  id: string;
+  level: 'info' | 'warning' | 'error' | 'critical';
+  message: string;
+  timestamp: string;
 }
