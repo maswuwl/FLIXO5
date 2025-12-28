@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FLIXO - المنصة الذكية</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=flixo">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --flixo-purple: #7C3AED;
+            --flixo-pink: #EC4899;
+            --flixo-orange: #F59E0B;
+        }
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            height: 100vh;
+            width: 100vw;
+            touch-action: manipulation;
+        }
+        .video-snap-container {
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100vh;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .video-snap-item {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            height: 100vh;
+            width: 100%;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .flixo-gradient {
+            background: linear-gradient(45deg, var(--flixo-purple), var(--flixo-pink), var(--flixo-orange));
+            background-size: 200% 200%;
+            animation: gradientMove 5s ease infinite;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes danceSlow {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-10px) rotate(4deg) scale(1.15); }
+        }
+        .dancing-letter {
+            display: inline-block;
+            animation: danceSlow 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+        }
+        /* حركة العلامة المائية الشاملة في كل زوايا الشاشة */
+        @keyframes likeeMove {
+            0% { top: 12%; left: 8%; opacity: 0.8; }
+            25% { top: 12%; left: 65%; opacity: 1; }
+            50% { top: 65%; left: 65%; opacity: 0.8; }
+            75% { top: 65%; left: 8%; opacity: 1; }
+            100% { top: 12%; left: 8%; opacity: 0.8; }
+        }
+        .likee-watermark-container {
+            position: absolute;
+            animation: likeeMove 20s linear infinite;
+            z-index: 100;
+            pointer-events: none;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+        }
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 5px var(--flixo-pink)); }
+            50% { transform: scale(1.25); filter: brightness(1.4) drop-shadow(0 0 20px var(--flixo-pink)); }
+        }
+        .logo-pulse {
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+        .flixo-text-gradient {
+            background: linear-gradient(45deg, var(--flixo-purple), var(--flixo-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@^19.2.3",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+        "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+        "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div id="splash-screen">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="w-24 h-24 flixo-gradient rounded-[2.5rem] flex items-center justify-center animate-logo-pulse mb-6 rotate-12 shadow-[0_0_60px_rgba(124,58,237,0.7)]">
+                <span style="font-family: 'Inter'; font-weight: 900; font-size: 3rem; color: white;">FX</span>
+            </div>
+            <h1 class="text-5xl font-black italic tracking-tighter flixo-text-gradient">FLIXO</h1>
+            <div class="mt-8 flex flex-col items-center">
+                <div class="h-[1.5px] w-24 bg-gradient-to-r from-transparent via-gray-400 to-transparent mb-4"></div>
+                <p class="text-[11px] text-gray-400 font-black uppercase tracking-[0.4em] opacity-80">Khalid Almontaser</p>
+            </div>
+        </div>
+    </div>
+    <div id="root"></div>
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if (splash) splash.classList.add('hidden');
+            }, 2200);
+        });
+    </script>
+</body>
+</html>

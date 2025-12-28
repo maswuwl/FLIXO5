@@ -1,0 +1,23 @@
+
+{
+  "short_name": "FLIXO",
+  "name": "FLIXO - المنصة الذكية",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=flixo",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=flixo",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "dir": "rtl",
+  "lang": "ar"
+}

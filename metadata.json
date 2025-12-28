@@ -1,0 +1,9 @@
+{
+  "name": "FLIXO",
+  "description": "فليكسو - المنصة الذكية للترفيه والتواصل الاجتماعي برؤية خالد المنتصر السيادية.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
