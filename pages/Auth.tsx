@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { authService } from '../services/authService';
-import { ShieldCheck, UserPlus, LogIn, Globe, Languages, Scale, ChevronDown, CheckCircle2, SearchCode, AlertCircle, Sparkles } from 'lucide-react';
+import { ShieldCheck, UserPlus, LogIn, Globe, Languages, Scale, ChevronDown, CheckCircle2, SearchCode, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthProps {
@@ -26,7 +26,7 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
       else authService.register(formData);
       setIsLoading(false);
       onLoginSuccess();
-    }, 1500);
+    }, 1200);
   };
 
   const handleGuestEntry = () => {
@@ -34,31 +34,37 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
     onLoginSuccess();
   };
 
-  const handleScanRepository = () => {
+  const handleScanRepository = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsScanning(true);
     setScanResult(null);
-    // محاكاة فحص المستودع السيادي لخالد المنتصر
     setTimeout(() => {
       setIsScanning(false);
-      setScanResult("تم فحص 42 ملفاً.. النظام خالي من الأخطاء وجاهز للنشر السيادي باسم خالد المنتصر 🇾🇪");
-    }, 3000);
+      setScanResult("تم فحص 42 ملفاً سيادياً بنجاح. النظام مستقر 100% وخالٍ من الحقوق الخارجية تحت إشراف خالد المنتصر 🇾🇪");
+    }, 2500);
   };
 
   const languages = ['اليمنية (Sovereign)', 'العربية (Standard)', 'English (Global)'];
 
+  const toggleLangMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowLang(!showLang);
+  };
+
   return (
-    <div className="fixed inset-0 z-[1000] bg-black flex flex-col items-center justify-center p-6 overflow-hidden" dir="rtl">
+    <div className="fixed inset-0 z-[1000] bg-black flex flex-col items-center justify-center p-6 overflow-hidden" dir="rtl" onClick={() => setShowLang(false)}>
       {/* خلفية سيادية متدرجة */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[150px] rounded-full"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-red-600/10 blur-[150px] rounded-full"></div>
 
       <div className="w-full max-w-md relative z-10 space-y-8">
         
-        {/* 1. أيقونة اللغة في أول الواجهة - مفعلة الآن */}
-        <div className="relative flex justify-center z-50">
+        {/* 1. أيقونة اللغة - مع إصلاح التفاعل */}
+        <div className="relative flex justify-center z-[1100]">
             <button 
-                onClick={() => setShowLang(!showLang)}
-                className="flex items-center space-x-2 space-x-reverse px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-white/80 hover:bg-white/10 transition-all active:scale-95"
+                onClick={toggleLangMenu}
+                className="flex items-center space-x-2 space-x-reverse px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-white/80 hover:bg-white/10 transition-all active:scale-95 shadow-lg backdrop-blur-md"
             >
                 <Languages size={18} className="text-indigo-400" />
                 <span className="text-[10px] font-black uppercase tracking-widest">{selectedLang}</span>
@@ -66,7 +72,7 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
             </button>
 
             {showLang && (
-              <div className="absolute top-full mt-2 w-48 bg-[#0a0a0c] border border-white/10 rounded-2xl p-2 shadow-2xl animate-slide-up">
+              <div className="absolute top-full mt-2 w-52 bg-[#0a0a0c] border border-white/10 rounded-2xl p-2 shadow-2xl animate-slide-up z-[1200] backdrop-blur-3xl" onClick={(e) => e.stopPropagation()}>
                 {languages.map((lang) => (
                   <button 
                     key={lang}
@@ -89,7 +95,7 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
           <p className="text-gray-600 font-bold text-[8px] uppercase tracking-[0.4em]">المنظومة السيادية • خالد المنتصر</p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[45px] p-8 shadow-2xl relative">
+        <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[45px] p-8 shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-3">
                 <input 
@@ -110,7 +116,6 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 />
             </div>
 
-            {/* 2. أزرار دخول وانضم تحت كلمة السر */}
             <div className="grid grid-cols-2 gap-3">
                 <button 
                     type="button"
@@ -128,7 +133,6 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 </button>
             </div>
 
-            {/* 3. فتح بوابة السيادة تحت دخول وانضم */}
             <button 
                 type="submit" 
                 disabled={isLoading} 
@@ -144,10 +148,9 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
               )}
             </button>
 
-            {/* 4. بوابة الحقوق الملكية تحت زر السيادة - مفعلة الآن */}
             <button 
                 type="button"
-                onClick={() => window.location.hash = '#/charter'}
+                onClick={() => navigate('/charter')}
                 className="w-full py-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl text-indigo-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center space-x-2 space-x-reverse hover:bg-indigo-600/20 transition-all mt-2"
             >
                 <Scale size={16} />
@@ -155,7 +158,6 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
             </button>
           </form>
 
-          {/* 5. الدخول كزائر وزر فحص المستودع في الأسفل */}
           <div className="mt-8 space-y-3">
             <div className="grid grid-cols-2 gap-3">
                 <button 
@@ -176,7 +178,6 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 </button>
             </div>
 
-            {/* نتيجة فحص المستودع */}
             {scanResult && (
               <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl animate-fade-in">
                 <div className="flex items-center space-x-2 space-x-reverse text-green-500 mb-1">

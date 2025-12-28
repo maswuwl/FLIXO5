@@ -6,15 +6,23 @@ const AUTH_KEY = 'flixo_auth_user';
 
 export const authService = {
   login: (username: string): User | null => {
-    const user = MOCK_USERS.find(u => u.username === username) || MOCK_USERS[0];
-    localStorage.setItem(AUTH_KEY, JSON.stringify(user));
-    return user;
+    try {
+      const user = MOCK_USERS.find(u => u.username === username) || MOCK_USERS[0];
+      localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+      return user;
+    } catch (e) {
+      console.error("Auth Login Error", e);
+      return null;
+    }
   },
 
   updateUser: (updatedUser: User) => {
-    localStorage.setItem(AUTH_KEY, JSON.stringify(updatedUser));
-    // إرسال حدث مخصص لتنبيه المكونات بتحديث البيانات
-    window.dispatchEvent(new Event('userUpdate'));
+    try {
+      localStorage.setItem(AUTH_KEY, JSON.stringify(updatedUser));
+      window.dispatchEvent(new Event('userUpdate'));
+    } catch (e) {
+      console.error("Update User Error", e);
+    }
   },
 
   loginAsGuest: (): User => {
@@ -53,8 +61,15 @@ export const authService = {
   },
 
   getCurrentUser: (): User | null => {
-    const saved = localStorage.getItem(AUTH_KEY);
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem(AUTH_KEY);
+      if (!saved || saved === "undefined") return null;
+      return JSON.parse(saved);
+    } catch (e) {
+      console.warn("Invalid user data in storage, clearing...");
+      localStorage.removeItem(AUTH_KEY);
+      return null;
+    }
   },
 
   isAuthenticated: (): boolean => {

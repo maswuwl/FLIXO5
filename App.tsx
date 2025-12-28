@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Feed from './pages/Feed';
@@ -35,41 +35,51 @@ const App: React.FC = () => {
     setIsAuthenticated(true);
   };
 
-  if (!isAuthenticated) {
-    return <Auth onLoginSuccess={handleLoginSuccess} />;
-  }
-
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Feed />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/create" element={<Create />} />
-          <Route path="/inbox" element={<Inbox />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/nearby" element={<FriendsNearby />} />
-          <Route path="/chess" element={<ChessArena />} />
-          <Route path="/newsroom" element={<Newsroom />} />
-          <Route path="/vault" element={<Vault />} />
-          <Route path="/ai-studio" element={<AIStudio />} />
-          <Route path="/wallet" element={<Wallet />} />
-          <Route path="/stocks" element={<SovereignStocks />} />
-          <Route path="/identity" element={<DigitalIdentity />} />
-          <Route path="/ai-buddy" element={<AIBuddy />} />
-          <Route path="/blueprint" element={<Blueprint />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/ports" element={<Ports />} />
-          <Route path="/charter" element={<Charter />} />
-          <Route path="/market" element={<Market />} />
-          <Route path="/settings" element={<Settings />} />
-          {currentUser?.celebrityTier === 0 && (
-            <Route path="/admin" element={<AdminDashboard />} />
-          )}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* المسارات المتاحة للجميع */}
+        <Route path="/charter" element={<Charter />} />
+
+        {/* المسارات المشروطة بتسجيل الدخول */}
+        {!isAuthenticated ? (
+          <Route path="*" element={<Auth onLoginSuccess={handleLoginSuccess} />} />
+        ) : (
+          <Route
+            path="/*"
+            element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Feed />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/create" element={<Create />} />
+                  <Route path="/inbox" element={<Inbox />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/nearby" element={<FriendsNearby />} />
+                  <Route path="/chess" element={<ChessArena />} />
+                  <Route path="/newsroom" element={<Newsroom />} />
+                  <Route path="/vault" element={<Vault />} />
+                  <Route path="/ai-studio" element={<AIStudio />} />
+                  <Route path="/wallet" element={<Wallet />} />
+                  <Route path="/stocks" element={<SovereignStocks />} />
+                  <Route path="/identity" element={<DigitalIdentity />} />
+                  <Route path="/ai-buddy" element={<AIBuddy />} />
+                  <Route path="/blueprint" element={<Blueprint />} />
+                  <Route path="/community" element={<Community />} />
+                  <Route path="/ports" element={<Ports />} />
+                  <Route path="/market" element={<Market />} />
+                  <Route path="/settings" element={<Settings />} />
+                  {currentUser?.celebrityTier === 0 && (
+                    <Route path="/admin" element={<AdminDashboard />} />
+                  )}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Layout>
+            }
+          />
+        )}
+      </Routes>
     </Router>
   );
 };
