@@ -41,6 +41,13 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
+        /* وضع المحادثة: إخفاء عناصر الواجهة الرئيسية */
+        body.in-chat-mode header,
+        body.in-chat-mode .fixed.bottom-4,
+        body.in-chat-mode .fixed.bottom-20 {
+            display: none !important;
+        }
+
         /* Aura Background */
         .aura-bg {
             position: fixed; inset: 0; z-index: -1;

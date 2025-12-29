@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Wand2, ShieldCheck, Zap, MessageSquare, Terminal, ChevronLeft, Send, Sparkles, Coins, Clock, Activity, Settings, Power, Bot } from 'lucide-react';
+import { Wand2, ShieldCheck, Zap, MessageSquare, Terminal, ChevronLeft, Send, Sparkles, Coins, Clock, Activity, Settings, Power, Bot, ChevronRight } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
@@ -13,6 +13,12 @@ const OverseerExpert: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showPayModal, setShowPayModal] = useState(false);
+
+  // تفعيل وضع المحادثة الكامل لإخفاء عناصر التحكم الرئيسية
+  useEffect(() => {
+    document.body.classList.add('in-chat-mode');
+    return () => document.body.classList.remove('in-chat-mode');
+  }, []);
 
   // حالة الأتمتة
   const [protocols, setProtocols] = useState({
@@ -62,19 +68,18 @@ const OverseerExpert: React.FC = () => {
   };
 
   const handlePayment = () => {
-    // محاكاة دفع 500 FX
     setIsSubscribed(true);
     setShowPayModal(false);
     setMessages(prev => [...prev, { role: 'model', text: "تم تفعيل بروتوكول السيادة الكامل. أنا الآن خبيرك المشرِف الخاص، سأنفذ أوامرك كل يوم بدقة متناهية." }]);
   };
 
   return (
-    <div className="h-full bg-[#050505] text-white flex flex-col" dir="rtl">
+    <div className="fixed inset-0 z-[500] bg-[#050505] text-white flex flex-col" dir="rtl">
       {/* Header */}
-      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/60 backdrop-blur-xl sticky top-0 z-50">
+      <div className="p-4 pt-12 border-b border-white/10 flex items-center justify-between bg-black/60 backdrop-blur-xl">
         <div className="flex items-center space-x-3 space-x-reverse">
           <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
-            <ChevronLeft size={20} />
+            <ChevronRight size={20} className="text-yellow-500" />
           </button>
           <div>
             <h1 className="text-xl font-black italic tracking-tighter flex items-center">
@@ -92,7 +97,7 @@ const OverseerExpert: React.FC = () => {
       <div className="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
         {/* Chat Area */}
         <div className="flex-1 flex flex-col border-l border-white/5">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-6 no-scrollbar">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-6 no-scrollbar pb-32">
             {messages.length === 0 && (
               <div className="h-full flex flex-col items-center justify-center text-center p-8 space-y-6">
                 <div className="w-24 h-24 bg-yellow-500/10 rounded-[40px] flex items-center justify-center border border-yellow-500/20 animate-sovereign-spin">
@@ -101,14 +106,14 @@ const OverseerExpert: React.FC = () => {
                 <div className="max-w-xs">
                   <h2 className="text-2xl font-black italic mb-2">أهلاً بك يا ركن</h2>
                   <p className="text-xs text-gray-500 font-bold leading-relaxed">
-                    أنا خبيرك المشرِف. ناقش معي كيف تريدني أن أدير حسابك، ما هي صلاحيات الإشراف التي تمنحني إياها؟ وكيف تريدني أن أبني مشاريعك؟
+                    أنا خبيرك المشرِف. ناقش معي كيف تريدني أن أدير حسابك، ما هي صلاحيات الإشراف التي تمنحني إياها؟
                   </p>
                 </div>
               </div>
             )}
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-start' : 'justify-end animate-slide-up'}`}>
-                <div className={`max-w-[85%] p-4 rounded-3xl text-sm ${m.role === 'user' ? 'bg-white/5 border border-white/10' : 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-50'}`}>
+                <div className={`max-w-[85%] p-4 rounded-3xl text-xs font-bold leading-relaxed ${m.role === 'user' ? 'bg-white/5 border border-white/10' : 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-50'}`}>
                   {m.text}
                 </div>
               </div>
@@ -120,22 +125,44 @@ const OverseerExpert: React.FC = () => {
             )}
           </div>
 
-          <div className="p-4 bg-black/80 border-t border-white/10">
+          {/* Unified Input with Mirror Text */}
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/90 backdrop-blur-3xl border-t border-white/10 z-[600]">
             <div className="flex items-center space-x-2 space-x-reverse max-w-4xl mx-auto">
-              <input 
-                value={input} 
-                onChange={(e) => setInput(e.target.value)} 
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()} 
-                placeholder="ناقش صلاحيات الخبير هنا..." 
-                className="flex-1 bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm focus:outline-none focus:border-yellow-500 transition-all" 
-              />
-              <button onClick={handleSend} className="p-4 bg-yellow-500 rounded-2xl text-black shadow-xl active:scale-95 transition-all"><Send size={20} /></button>
+              <div className="flex-1 relative">
+                <input 
+                  autoFocus
+                  value={input} 
+                  onChange={(e) => setInput(e.target.value)} 
+                  onKeyPress={(e) => e.key === 'Enter' && handleSend()} 
+                  placeholder="ناقش صلاحيات الخبير هنا..." 
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-yellow-500 transition-all shadow-inner" 
+                />
+              </div>
+              <button 
+                onClick={handleSend} 
+                disabled={!input.trim()}
+                className="w-12 h-12 rounded-2xl bg-yellow-500 text-black flex items-center justify-center shadow-lg shadow-yellow-500/20 active:scale-90 transition-all disabled:opacity-30"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+
+            {/* Mirror Text Mirror - تظهر تحت زر الكتابة/الشريط لرؤية ما يتم كتابته بوضوح */}
+            <div className="mt-2 h-6 flex items-center justify-center px-4 overflow-hidden pointer-events-none">
+              {input && (
+                <div className="flex items-center space-x-2 space-x-reverse bg-yellow-500/10 border border-yellow-500/20 px-3 py-1 rounded-full animate-fade-in max-w-full">
+                  <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse"></div>
+                  <span className="text-[10px] font-black text-yellow-400 italic truncate tracking-wide">
+                    {input}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Status Dashboard - Desktop Only Side / Mobile Toggle */}
-        <div className="w-full lg:w-80 bg-black/40 backdrop-blur-2xl p-6 overflow-y-auto no-scrollbar space-y-6">
+        {/* Dashboard - Visible on larger screens */}
+        <div className="hidden lg:block w-80 bg-black/40 backdrop-blur-2xl p-6 overflow-y-auto no-scrollbar space-y-6">
           <div className="flex items-center space-x-2 space-x-reverse mb-4">
              <Activity size={18} className="text-yellow-500" />
              <h3 className="text-xs font-black uppercase tracking-widest">لوحة التحكم بالبروتوكولات</h3>
@@ -165,29 +192,10 @@ const OverseerExpert: React.FC = () => {
              ))}
           </div>
 
-          {/* Time Frequency */}
-          <div className="bg-white/5 border border-white/5 p-4 rounded-2xl space-y-3">
-             <div className="flex items-center space-x-2 space-x-reverse">
-                <Clock size={14} className="text-indigo-400" />
-                <span className="text-[10px] font-black">تكرار المهام</span>
-             </div>
-             <div className="grid grid-cols-3 gap-2">
-                {['6h', '12h', '24h'].map(t => (
-                  <button 
-                    key={t}
-                    onClick={() => isSubscribed && setProtocols(prev => ({...prev, frequency: t}))}
-                    className={`py-2 rounded-lg text-[9px] font-black transition-all ${protocols.frequency === t ? 'bg-indigo-600 text-white' : 'bg-black/40 text-gray-500'}`}
-                  >
-                    {t === '6h' ? '6 ساعات' : t === '12h' ? '12 ساعة' : 'يومياً'}
-                  </button>
-                ))}
-             </div>
-          </div>
-
           <div className="p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-2xl flex items-start space-x-3 space-x-reverse">
              <ShieldCheck size={16} className="text-yellow-500 mt-1 shrink-0" />
              <p className="text-[8px] text-gray-500 font-bold leading-relaxed">
-               بمجرد تفعيل "البروتوكول"، سأقوم بمراجعة حسابك والقيام بالمهام كل دورة زمنية حتى تطلب مني التوقف.
+               بمجرد تفعيل "البروتوكول"، سأقوم بمراجعة حسابك والقيام بالمهام دورياً.
              </p>
           </div>
         </div>
@@ -195,7 +203,7 @@ const OverseerExpert: React.FC = () => {
 
       {/* Payment Modal */}
       {showPayModal && (
-        <div className="fixed inset-0 z-[300] bg-black/90 backdrop-blur-2xl flex items-center justify-center p-6 animate-fade-in">
+        <div className="fixed inset-0 z-[700] bg-black/90 backdrop-blur-2xl flex items-center justify-center p-6 animate-fade-in">
           <div className="bg-white/5 border border-white/10 rounded-[40px] p-8 max-w-sm w-full text-center space-y-6 relative overflow-hidden shadow-[0_0_80px_rgba(236,72,153,0.1)]">
              <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 blur-3xl"></div>
              <div className="w-20 h-20 bg-yellow-500/20 rounded-3xl flex items-center justify-center mx-auto border border-yellow-500/30">
