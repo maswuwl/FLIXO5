@@ -51,9 +51,9 @@ const GlobalSearch: React.FC = () => {
     return (
       <button 
         onClick={() => setIsOpen(true)} 
-        className="p-3 bg-white/5 border border-white/10 rounded-2xl text-gray-400 hover:text-white hover:bg-pink-500/20 hover:scale-110 transition-all active:scale-90 animate-pulse-glow"
+        className="w-7 h-7 glass-order4 rounded-lg flex items-center justify-center text-gray-400 active-tap animate-pulse-glow"
       >
-        <Search size={20} className="animate-search-vibrate" />
+        <Search size={14} className="animate-search-vibrate" />
       </button>
     );
   }
