@@ -2,6 +2,13 @@
 // Add missing types for the FLIXO ecosystem
 export type CelebrityColorTier = 0 | 1 | 2 | 3 | 4 | 5;
 
+export interface UserSocialLinks {
+  facebook?: string;
+  twitter?: string;
+  instagram?: string;
+  website?: string;
+}
+
 export interface User {
   id: string;
   username: string;
@@ -9,6 +16,8 @@ export interface User {
   avatar: string;
   cover?: string;
   bio?: string;
+  location?: string;
+  birthDate?: string;
   followers: number;
   following: number;
   likes: number;
@@ -18,6 +27,12 @@ export interface User {
   referralCode?: string;
   isGuest?: boolean;
   hasPremiumWatermark?: boolean;
+  socialLinks?: UserSocialLinks;
+  autoPostEnabled?: {
+    facebook: boolean;
+    twitter: boolean;
+    instagram: boolean;
+  };
 }
 
 export interface ContentItem {

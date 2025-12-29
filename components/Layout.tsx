@@ -66,14 +66,14 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
       <AppDownloadBanner />
 
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[110]" onClick={toggleMenu}></div>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] pointer-events-auto" onClick={toggleMenu}></div>
       )}
 
       {/* Sidebar Trigger Hidden Button for Global reference */}
-      <button id="sidebar-toggle-btn" onClick={toggleMenu} className="hidden"></button>
+      <button id="sidebar-toggle-btn" onClick={toggleMenu} className="hidden pointer-events-none"></button>
 
       {/* Sidebar Menu */}
-      <div className={`fixed top-0 left-0 h-full w-80 border-r z-[120] transition-transform duration-500 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl ${isDarkMode ? 'bg-[#0a0a0c]/95 border-white/10' : 'bg-white border-black/5'}`}>
+      <div className={`fixed top-0 left-0 h-full w-80 border-r z-[120] transition-transform duration-500 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl ${isDarkMode ? 'bg-[#0a0a0c]/95 border-white/10' : 'bg-white border-black/5'} pointer-events-auto`}>
         <div className="p-6 flex flex-col h-full">
           <div className="flex justify-between items-center mb-10">
             <button onClick={toggleMenu} className={`p-2.5 rounded-2xl transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}><X size={24} /></button>
@@ -137,26 +137,28 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      <main className="flex-1 overflow-hidden relative bg-transparent">
+      {/* Main content container adjusted for nav height */}
+      <main className="flex-1 relative bg-transparent overflow-hidden">
         {children}
       </main>
 
-      <nav className={`h-20 backdrop-blur-3xl border-t flex items-center justify-around px-2 z-50 transition-colors ${isDarkMode ? 'bg-black/40 border-white/5' : 'bg-white/90 border-black/5'}`}>
-        <button onClick={() => navigate('/')} className={`flex flex-col items-center space-y-1 transition-all flex-1 ${isActive('/') ? (isDarkMode ? 'text-white scale-110' : 'text-black scale-110 font-black') : 'text-gray-600'}`}>
+      {/* Bottom navigation bar */}
+      <nav className={`h-20 backdrop-blur-3xl border-t flex items-center justify-around px-2 z-[90] transition-colors ${isDarkMode ? 'bg-black/40 border-white/5' : 'bg-white/90 border-black/5'} pointer-events-auto`}>
+        <button onClick={() => navigate('/')} className={`flex flex-col items-center space-y-1 transition-all flex-1 pointer-events-auto ${isActive('/') ? (isDarkMode ? 'text-white scale-110' : 'text-black scale-110 font-black') : 'text-gray-600'}`}>
           <Home size={22} /><span className="text-[9px] font-black uppercase">الرئيسية</span>
         </button>
-        <button onClick={() => navigate('/community')} className={`flex flex-col items-center space-y-1 transition-all flex-1 ${isActive('/community') ? 'text-indigo-500 scale-110' : 'text-gray-600'}`}>
+        <button onClick={() => navigate('/community')} className={`flex flex-col items-center space-y-1 transition-all flex-1 pointer-events-auto ${isActive('/community') ? 'text-indigo-500 scale-110' : 'text-gray-600'}`}>
           <Users size={22} /><span className="text-[9px] font-black uppercase">المجتمع</span>
         </button>
-        <button onClick={() => navigate('/create')} className="flex flex-col items-center -mt-8 flex-1 group z-50">
+        <button onClick={() => navigate('/create')} className="flex flex-col items-center -mt-8 flex-1 group z-[100] pointer-events-auto">
           <div className="w-14 h-14 flixo-gradient rounded-full flex items-center justify-center shadow-2xl border-4 border-black group-active:scale-90 transition-all">
             <Plus size={30} className="text-white" strokeWidth={3} />
           </div>
         </button>
-        <button onClick={() => navigate('/wallet')} className={`flex flex-col items-center space-y-1 transition-all flex-1 ${isActive('/wallet') ? (isDarkMode ? 'text-yellow-500 scale-110' : 'text-yellow-600 scale-110 font-black') : 'text-gray-600'}`}>
+        <button onClick={() => navigate('/wallet')} className={`flex flex-col items-center space-y-1 transition-all flex-1 pointer-events-auto ${isActive('/wallet') ? (isDarkMode ? 'text-yellow-500 scale-110' : 'text-yellow-600 scale-110 font-black') : 'text-gray-600'}`}>
           <Wallet size={22} /><span className="text-[9px] font-black uppercase">المحفظة</span>
         </button>
-        <button onClick={() => navigate('/profile')} className={`flex flex-col items-center space-y-1 transition-all flex-1 ${isActive('/profile') ? (isDarkMode ? 'text-white scale-110' : 'text-black scale-110 font-black') : 'text-gray-600'}`}>
+        <button onClick={() => navigate('/profile')} className={`flex flex-col items-center space-y-1 transition-all flex-1 pointer-events-auto ${isActive('/profile') ? (isDarkMode ? 'text-white scale-110' : 'text-black scale-110 font-black') : 'text-gray-600'}`}>
           <User size={22} /><span className="text-[9px] font-black uppercase">حسابي</span>
         </button>
       </nav>

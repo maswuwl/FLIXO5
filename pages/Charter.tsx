@@ -19,7 +19,7 @@ const Charter: React.FC = () => {
     },
     { 
       title: "أمانك سيادي ومقدس", 
-      content: "نحن نحميك من أي تنمر أو إساءة عبر أنظمة ذكية تعمل وفق قيمنا اليمانية الأصيلة.",
+      content: "نحن نحمي حقك ونضمن عدم الإساءة إليك عبر أنظمة ذكية تعمل وفق قيمنا اليمانية الأصيلة.",
       icon: <ShieldCheck className="text-blue-500" />
     },
     { 
@@ -31,7 +31,8 @@ const Charter: React.FC = () => {
 
   return (
     <div className="h-full bg-black text-white flex flex-col overflow-y-auto pb-40 no-scrollbar" dir="rtl">
-      <div className="h-1.5 w-full flex">
+      {/* علم الملكية في الأعلى */}
+      <div className="h-1.5 w-full flex shrink-0">
          <div className="flex-1 bg-[#CE1126]"></div>
          <div className="flex-1 bg-white"></div>
          <div className="flex-1 bg-black"></div>
@@ -52,10 +53,10 @@ const Charter: React.FC = () => {
         <div className="p-8 bg-white/5 border border-white/10 rounded-[45px] relative">
            <div className="flex items-center space-x-2 space-x-reverse mb-4">
               <Sparkles size={16} className="text-yellow-500" />
-              <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest">عهد المطور خالد المنتصر</span>
+              <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest">إعلان السيادة الرقمية</span>
            </div>
            <p className="text-sm text-gray-300 leading-relaxed font-bold italic">
-             "أنا خالد المنتصر، أتعهد أمام الله وأمامكم أن تكون هذه المنصة واحة للأمان والإبداع، وأن تظل حقوقكم ملكية مقدسة لا تُمس."
+             "بصفتي المؤسس والمطور خالد المنتصر، أعلن التزامي الصارم بجعل منصة فليكسو بيئة آمنة ومبتكرة، مع ضمان الحقوق الرقمية والسيادة الكاملة لكل مستخدم على بياناته ومحتواه الخاص وفقاً لأرقى المعايير التقنية."
            </p>
         </div>
 
@@ -77,15 +78,6 @@ const Charter: React.FC = () => {
              <p>جميع العمليات في المنصة تخضع لقانون فليكسو السيادي.</p>
              <p>حقوق الطبع والنشر والبرمجة © 2025 محفوظة حصراً للمطور خالد المنتصر.</p>
            </div>
-        </div>
-
-        <div className="pt-12 text-center border-t border-white/5">
-           <div className="flex items-center justify-center space-x-2 space-x-reverse mb-4">
-              <div className="w-10 h-5 bg-[#CE1126] border border-white/10"></div>
-              <div className="w-10 h-5 bg-white border border-white/10"></div>
-              <div className="w-10 h-5 bg-black border border-white/10"></div>
-           </div>
-           <p className="text-[9px] text-gray-600 font-black uppercase tracking-[0.5em]">KHALID ALMONTASER • SOVEREIGN YEMEN</p>
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ interface ProfileGuardProps {
   children: React.ReactNode;
   isActive: boolean;
   size?: 'sm' | 'md' | 'lg';
-  isSovereign?: boolean; // خاصية جديدة للسيادة
+  isSovereign?: boolean;
 }
 
 const ProfileGuard: React.FC<ProfileGuardProps> = ({ children, isActive, size = 'md', isSovereign = false }) => {
@@ -23,7 +23,7 @@ const ProfileGuard: React.FC<ProfileGuardProps> = ({ children, isActive, size = 
     : { border: 'border-blue-500', shadow: 'shadow-blue-500/50', bg: 'bg-blue-600', glow: 'rgba(59,130,246,0.5)' };
 
   return (
-    <div className="relative inline-block pointer-events-none group">
+    <div className="relative inline-block group pointer-events-auto">
       {/* الإطار المتوهج اللامع */}
       <div className={`absolute inset-0 rounded-full border-[3px] ${colors.border} shadow-[0_0_20px_${colors.glow}] animate-pulse z-10 pointer-events-none`}>
         {isSovereign && (
@@ -31,13 +31,19 @@ const ProfileGuard: React.FC<ProfileGuardProps> = ({ children, isActive, size = 
         )}
       </div>
       
-      {/* الطبقة الشفافة التي تمنع النقر اليميني أو النسخ */}
-      <div className="absolute inset-0 rounded-full z-20 bg-transparent select-none" onContextMenu={(e) => e.preventDefault()}></div>
+      {/* طبقة الحماية الشفافة التي تمنع السحب أو القوائم السياقية دون حجب النقر الأساسي */}
+      <div 
+        className="absolute inset-0 rounded-full z-20 bg-transparent select-none cursor-pointer" 
+        onContextMenu={(e) => e.preventDefault()}
+        style={{ WebkitUserSelect: 'none' }}
+      ></div>
       
-      {children}
+      <div className="relative z-0">
+        {children}
+      </div>
 
       {/* أيقونة الدرع في الأسفل */}
-      <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 z-30 ${colors.bg} border-2 border-black p-0.5 rounded-full shadow-lg transition-transform duration-500 scale-110`}>
+      <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 z-30 ${colors.bg} border-2 border-black p-0.5 rounded-full shadow-lg transition-transform duration-500 scale-110 pointer-events-none`}>
         <ShieldCheck size={shieldSizes[size]} className="text-white" fill="currentColor" />
       </div>
     </div>
