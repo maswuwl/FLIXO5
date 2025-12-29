@@ -26,6 +26,7 @@ import Charter from './pages/Charter';
 import SovereignStocks from './pages/SovereignStocks';
 import DigitalIdentity from './pages/DigitalIdentity';
 import OverseerExpert from './pages/OverseerExpert';
+import Groups from './pages/Groups';
 import { authService } from './services/authService';
 
 const App: React.FC = () => {
@@ -59,6 +60,7 @@ const App: React.FC = () => {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/nearby" element={<FriendsNearby />} />
                   <Route path="/chess" element={<ChessArena />} />
+                  <Route path="/groups" element={<Groups />} />
                   <Route path="/newsroom" element={<Newsroom />} />
                   <Route path="/vault" element={<Vault />} />
                   <Route path="/ai-studio" element={<AIStudio />} />

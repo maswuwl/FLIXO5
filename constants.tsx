@@ -1,5 +1,5 @@
 
-import { ContentItem, User, Gift } from './types';
+import { ContentItem, User, Gift, Group } from './types';
 
 export const MOCK_USERS: User[] = [
   {
@@ -46,6 +46,25 @@ export const MOCK_USERS: User[] = [
 
 export const MOCK_FEED: ContentItem[] = [
   {
+    id: 'chess_live_1',
+    type: 'chess_game',
+    author: MOCK_USERS[0],
+    content: 'أنا الآن في مواجهة كبرى ضد نظام فليكسو AI في ساحة الشطرنج الملكية. تفضلوا بالمشاهدة والدعم! ⚔️👑',
+    mediaUrl: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200',
+    likes: 12500,
+    comments: 890,
+    shares: 450,
+    saves: 1200,
+    timestamp: 'الآن مباشر',
+    isFeaturedByPlatform: true,
+    gameData: {
+      player1: 'خالد المنتصر',
+      player2: 'نظام فليكسو AI',
+      status: 'live'
+    },
+    tags: ['شطرنج_فليكسو', 'سيادة_عقلية']
+  },
+  {
     id: 'post_1',
     type: 'video',
     author: MOCK_USERS[0],
@@ -71,6 +90,29 @@ export const MOCK_FEED: ContentItem[] = [
     saves: 12000,
     timestamp: 'منذ ساعة',
     tags: ['إبداع', 'فليكسو_ماركت']
+  }
+];
+
+export const MOCK_GROUPS: Group[] = [
+  {
+    id: 'g1',
+    name: 'صناع المحتوى السيادي',
+    cover: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200',
+    description: 'تجمع نخبة المبدعين في منصة فليكسو لتطوير الأفكار والتعاون البرمجي.',
+    membersCount: 15400,
+    isVerified: true,
+    verificationType: 'royal',
+    ownerId: 'admin_khalid'
+  },
+  {
+    id: 'g2',
+    name: 'نادي الشطرنج العالمي',
+    cover: 'https://images.unsplash.com/photo-1528819622765-d6bcf132f793?auto=format&fit=crop&w=1200',
+    description: 'لمحبي التحديات العقلية والمواجهات المباشرة في ساحة فليكسو.',
+    membersCount: 8900,
+    isVerified: true,
+    verificationType: 'community',
+    ownerId: 'sara_yemen'
   }
 ];
 

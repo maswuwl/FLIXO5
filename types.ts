@@ -12,6 +12,17 @@ export interface ExternalAsset {
   incomeTrackingEnabled: boolean;
 }
 
+export interface Group {
+  id: string;
+  name: string;
+  cover: string;
+  description: string;
+  membersCount: number;
+  isVerified: boolean;
+  verificationType: 'royal' | 'community' | 'creative';
+  ownerId: string;
+}
+
 export interface UserSocialLinks {
   facebook?: string;
   twitter?: string;
@@ -48,7 +59,7 @@ export interface User {
 
 export interface ContentItem {
   id: string;
-  type: 'video' | 'image' | 'text';
+  type: 'video' | 'image' | 'text' | 'chess_game';
   author: User;
   content: string;
   mediaUrl?: string;
@@ -59,9 +70,13 @@ export interface ContentItem {
   timestamp: string;
   isFeaturedByPlatform?: boolean;
   tags?: string[];
+  gameData?: {
+    player1: string;
+    player2: string;
+    status: 'live' | 'finished';
+  };
 }
 
-// Fixed missing Gift interface
 export interface Gift {
   id: string;
   name: string;
@@ -70,7 +85,6 @@ export interface Gift {
   type: '3d' | 'animated' | 'static';
 }
 
-// Fixed missing Memo interface
 export interface Memo {
   id: string;
   senderId: string;
@@ -83,7 +97,6 @@ export interface Memo {
   timestamp: string;
 }
 
-// Fixed missing Project interface
 export interface Project {
   id: string;
   name: string;
@@ -100,7 +113,6 @@ export interface Project {
   }[];
 }
 
-// Fixed missing PlatformStats interface
 export interface PlatformStats {
   totalUsers: number;
   activeUsers: number;
@@ -108,7 +120,6 @@ export interface PlatformStats {
   growth: number;
 }
 
-// Fixed missing SystemLog interface
 export interface SystemLog {
   id: string;
   type: 'info' | 'warning' | 'error';

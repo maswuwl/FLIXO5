@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2 } from 'lucide-react';
+import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2, Gamepad2, Users } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import GlobalSearch from './GlobalSearch';
@@ -31,20 +31,19 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
 
   const menuItems = [
     { label: 'الخبير المشرف', icon: <Wand2 size={10} />, path: '/overseer', color: 'text-yellow-400' },
+    { label: 'ساحة الألعاب', icon: <Gamepad2 size={10} />, path: '/chess', color: 'text-green-400' },
+    { label: 'المجتمعات', icon: <Users size={10} />, path: '/groups', color: 'text-blue-400' },
     { label: 'المخطط السيادي', icon: <Scale size={10} />, path: '/blueprint', color: 'text-pink-400' },
     { label: 'بورصة فليكسو', icon: <TrendingUp size={10} />, path: '/stocks', color: 'text-purple-400' },
     { label: 'الهوية الضوئية', icon: <BadgeCheck size={10} />, path: '/identity', color: 'text-pink-500' },
-    { label: 'مختبر الأكواد', icon: <Brain size={10} />, path: '/ai-studio', color: 'text-indigo-400' },
     { label: 'غرفة الأخبار', icon: <Newspaper size={10} />, path: '/newsroom', color: 'text-red-400' },
   ];
 
-  // التحقق مما إذا كانت الواجهة الحالية هي واجهة محادثة لإخفاء الأيقونات العائمة
   const isInChatMode = location.pathname.includes('/inbox') || location.pathname.includes('/overseer') || location.pathname.includes('/ai-buddy');
 
   return (
     <div className={`relative h-screen flex flex-col overflow-hidden bg-transparent ${isDarkMode ? 'dark' : 'light'}`} dir="rtl">
       
-      {/* Header - Compact */}
       {!isInChatMode && (
         <header className="h-12 flex items-center justify-between px-3 z-[100] relative bg-black/10 backdrop-blur-md border-b border-white/5">
           <div className="flex items-center space-x-1.5 space-x-reverse">
@@ -79,7 +78,6 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
 
-      {/* Floating Messenger (Left Side) - Hidden in chat mode */}
       {!isInChatMode && (
         <div className="fixed bottom-20 left-4 z-[150] flex flex-col items-center">
           {isChatOpen && (
@@ -100,7 +98,6 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
         </div>
       )}
 
-      {/* Floating Overseer Quick Access (Right Side) - Hidden in chat mode */}
       {!isInChatMode && (
         <div className="fixed bottom-20 right-4 z-[150] flex flex-col items-center">
            <button 
@@ -113,7 +110,6 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
         </div>
       )}
 
-      {/* Sidebar - Compact Menu */}
       <aside className={`fixed top-0 left-0 h-full w-[200px] glass-order4 z-[120] transition-transform duration-500 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 flex flex-col h-full">
           <div className="flex justify-between items-center mb-4">
@@ -149,7 +145,6 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </aside>
 
-      {/* Bottom Nav - Compact - Hidden in chat mode */}
       {!isInChatMode && (
         <div className="fixed bottom-4 left-0 right-0 flex justify-center z-[110] px-3">
           <nav className="h-10 glass-order4 rounded-2xl flex items-center justify-between px-3 shadow-xl w-full max-w-xs">

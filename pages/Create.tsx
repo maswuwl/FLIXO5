@@ -1,12 +1,12 @@
 
 import React, { useState, useRef } from 'react';
-import { Sparkles, X, Camera, Share2, Facebook, Twitter, Instagram, Globe, Zap, Loader2, Monitor, ShieldCheck } from 'lucide-react';
-import { geminiService } from '../services/geminiService';
+import { Sparkles, X, Camera, Share2, Facebook, Twitter, Instagram, Globe, Zap, Loader2, Monitor, ShieldCheck, Send, Image as ImageIcon } from 'lucide-react';
 import { authService } from '../services/authService';
 
 const Create: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [content, setContent] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
   const currentUser = authService.getCurrentUser();
 
@@ -28,8 +28,21 @@ const Create: React.FC = () => {
     );
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const isPublishable = content.trim().length > 0 || selectedImage !== null;
+
   const handlePublish = () => {
-    if (!content.trim()) return;
+    if (!isPublishable) return;
     setIsProcessing(true);
     
     // محاكاة النشر الموحد
@@ -54,11 +67,27 @@ const Create: React.FC = () => {
 
   return (
     <div className="relative h-full bg-black flex flex-col items-center p-6 pt-12 overflow-y-auto pb-32 no-scrollbar" dir="rtl">
-      <div className="absolute top-12 left-6">
-        <X size={28} className="text-white cursor-pointer hover:rotate-90 transition-transform" onClick={() => window.history.back()} />
+      {/* Header Bar */}
+      <div className="absolute top-12 left-0 right-0 px-6 flex items-center justify-between z-50">
+        <button 
+          onClick={() => window.history.back()}
+          className="p-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-white hover:bg-white/10 transition-all active:scale-90"
+        >
+          <X size={24} />
+        </button>
+
+        {isPublishable && (
+          <button 
+            onClick={handlePublish}
+            disabled={isProcessing}
+            className="flex items-center space-x-2 space-x-reverse bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 rounded-2xl text-white font-black text-xs shadow-xl shadow-pink-500/20 animate-fade-in active:scale-95 transition-all disabled:opacity-50"
+          >
+            {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <><Send size={16} /> <span>نشر الآن</span></>}
+          </button>
+        )}
       </div>
 
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 mt-12">
         <h1 className="text-3xl font-black italic tracking-tighter mb-2 uppercase">تأسيس <span className="flixo-text-gradient">محتوى سيادي</span></h1>
         <p className="text-gray-500 font-bold text-[8px] uppercase tracking-widest">Sovereign Content Bridge & Web Sync</p>
       </div>
@@ -120,7 +149,7 @@ const Create: React.FC = () => {
           </div>
         )}
 
-        {/* منطقة الكتابة */}
+        {/* منطقة الكتابة والمعاينة */}
         <div className="bg-white/5 border border-white/10 rounded-[40px] p-6 space-y-6">
            <textarea 
              value={content}
@@ -128,26 +157,42 @@ const Create: React.FC = () => {
              placeholder="اكتب فكرتك السيادية.. سيتكفل فليكسو بنشرها في إمبراطوريتك الرقمية."
              className="w-full bg-black/40 border border-white/5 rounded-3xl p-6 text-sm focus:outline-none focus:border-indigo-500 min-h-[140px] text-right text-white"
            />
+
+           {selectedImage && (
+             <div className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10 animate-scale-in">
+               <img src={selectedImage} className="w-full h-full object-cover" alt="preview" />
+               <button 
+                 onClick={() => setSelectedImage(null)}
+                 className="absolute top-2 right-2 p-1.5 bg-black/60 backdrop-blur-md rounded-full text-white"
+               >
+                 <X size={16} />
+               </button>
+               <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                 <span className="text-[8px] font-black text-white uppercase tracking-widest">صورة مختارة</span>
+               </div>
+             </div>
+           )}
            
            <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => fileInputRef.current?.click()} className="py-4 bg-white/5 border border-white/5 rounded-[25px] flex items-center justify-center space-x-3 space-x-reverse text-gray-400 active:scale-95 transition-all">
+              <button onClick={() => fileInputRef.current?.click()} className="py-4 bg-white/5 border border-white/5 rounded-[25px] flex items-center justify-center space-x-3 space-x-reverse text-gray-400 active:scale-95 transition-all hover:bg-white/10">
                 <Camera size={20} />
                 <span className="text-[10px] font-black uppercase tracking-widest">وسائط</span>
               </button>
-              <button className="py-4 bg-indigo-600/10 border border-indigo-500/30 rounded-[25px] flex items-center justify-center space-x-3 space-x-reverse text-indigo-400 active:scale-95 transition-all">
+              <button className="py-4 bg-indigo-600/10 border border-indigo-500/30 rounded-[25px] flex items-center justify-center space-x-3 space-x-reverse text-indigo-400 active:scale-95 transition-all hover:bg-indigo-600/20">
                 <Sparkles size={20} />
                 <span className="text-[10px] font-black uppercase tracking-widest">ذكاء Veo</span>
               </button>
            </div>
-           <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" />
+           <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" onChange={handleFileChange} />
         </div>
 
+        {/* Bottom Primary Button */}
         <button 
           onClick={handlePublish}
-          disabled={isProcessing || !content.trim()}
+          disabled={isProcessing || !isPublishable}
           className="w-full py-6 flixo-gradient rounded-[35px] text-white font-black text-xl shadow-2xl active:scale-95 transition-all flex items-center justify-center space-x-4 space-x-reverse disabled:opacity-50"
         >
-          {isProcessing ? <Loader2 size={24} className="animate-spin" /> : <><Zap size={24} fill="white" /> <span>نشر سيادي ومزامنة شاملة</span></>}
+          {isProcessing ? <Loader2 size={24} className="animate-spin" /> : <><Zap size={24} fill="white" /> <span>نشر سيادي وشامل</span></>}
         </button>
       </div>
     </div>

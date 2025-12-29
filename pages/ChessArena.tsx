@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Trophy, Users, Send, Gift, MessageSquare, ShieldCheck, Zap, Share2, Sparkles, UserPlus, Brain, ChevronLeft } from 'lucide-react';
+import { Trophy, Users, Send, Gift, MessageSquare, ShieldCheck, Zap, Share2, Sparkles, UserPlus, Brain, ChevronLeft, Palette, User } from 'lucide-react';
 import { MOCK_USERS, MOCK_GIFTS } from '../constants';
 import GiftsOverlay from '../components/GiftsOverlay';
 import { geminiService } from '../services/geminiService';
@@ -10,12 +10,14 @@ const ChessArena: React.FC = () => {
   const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
   const [spectatorCount, setSpectatorCount] = useState(1250);
   const [isAiThinking, setIsAiThinking] = useState(false);
+  const [gameMode, setGameMode] = useState<'system' | 'friend'>('system');
+  const [pieceColor, setPieceColor] = useState<string>('text-yellow-500'); // لون اللاعب الافتراضي
+  
   const [messages, setMessages] = useState([
     { user: 'سارة_فليكسو', text: 'يا إلهي! حركة ذكية جداً من خالد 🔥', color: 'text-pink-400' },
     { user: 'نظام_الذكاء', text: 'جاري تحليل الثغرات في دفاع الخصم...', color: 'text-indigo-400' },
   ]);
 
-  // محاكاة رقعة شطرنج (تبسيط للتصميم)
   const initialBoard = [
     ['♜','♞','♝','♛','♚','♝','♞','♜'],
     ['♟','♟','♟','♟','♟','♟','♟','♟'],
@@ -29,16 +31,26 @@ const ChessArena: React.FC = () => {
 
   const handlePieceClick = (piece: string) => {
     if (piece) setSelectedPiece(piece);
+    if (gameMode === 'system') {
+      setIsAiThinking(true);
+      setTimeout(() => setIsAiThinking(false), 1500);
+    }
   };
 
+  const colors = [
+    { label: 'ذهبي سيادي', class: 'text-yellow-500', hex: '#EAB308' },
+    { label: 'أرجواني ملكي', class: 'text-purple-500', hex: '#A855F7' },
+    { label: 'أزرق سماوي', class: 'text-blue-400', hex: '#60A5FA' },
+    { label: 'أخضر زمردي', class: 'text-emerald-500', hex: '#10B981' }
+  ];
+
   const inviteFollowers = () => {
-    alert("تم إرسال دعوة لجميع متابعيك لمشاهدة الملحمة!");
+    alert("تم إرسال إشعار فوري لجميع المتابعين: 'خالد المنتصر بدأ مواجهة شطرنج ملكية.. انضم للمشاهدة الآن!'");
   };
 
   return (
     <div className="h-full bg-[#050505] text-white flex flex-col md:flex-row overflow-hidden no-scrollbar" dir="rtl">
       
-      {/* القسم الرئيسي: الرقعة والمعلومات */}
       <div className="flex-1 flex flex-col p-4 pt-12 overflow-y-auto no-scrollbar">
         <div className="flex items-center justify-between mb-8">
           <button onClick={() => window.history.back()} className="p-3 bg-white/5 rounded-2xl"><ChevronLeft size={24} /></button>
@@ -52,7 +64,22 @@ const ChessArena: React.FC = () => {
           </div>
         </div>
 
-        {/* معلومات اللاعبين */}
+        {/* Game Settings */}
+        <div className="flex bg-white/5 p-1 rounded-2xl mb-6 border border-white/10">
+           <button 
+            onClick={() => setGameMode('system')} 
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all flex items-center justify-center space-x-2 space-x-reverse ${gameMode === 'system' ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-500'}`}
+           >
+              <Brain size={14} /> <span>ضد النظام</span>
+           </button>
+           <button 
+            onClick={() => setGameMode('friend')} 
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all flex items-center justify-center space-x-2 space-x-reverse ${gameMode === 'friend' ? 'bg-pink-600 text-white shadow-lg' : 'text-gray-500'}`}
+           >
+              <User size={14} /> <span>تحدي صديق</span>
+           </button>
+        </div>
+
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-3 space-x-reverse">
              <div className="w-14 h-14 rounded-2xl border-2 border-yellow-500 p-0.5 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
@@ -60,7 +87,10 @@ const ChessArena: React.FC = () => {
              </div>
              <div>
                <span className="block font-black text-sm">خالد المنتصر</span>
-               <span className="text-[10px] text-yellow-500 font-bold uppercase tracking-widest">المصنف الأول 👑</span>
+               <div className="flex items-center space-x-2 space-x-reverse mt-1">
+                  <div className={`w-3 h-3 rounded-full ${pieceColor.replace('text', 'bg')}`}></div>
+                  <span className="text-[10px] text-yellow-500 font-bold uppercase tracking-widest">أنت 👑</span>
+               </div>
              </div>
           </div>
           
@@ -73,18 +103,32 @@ const ChessArena: React.FC = () => {
 
           <div className="flex items-center space-x-3 space-x-reverse">
              <div className="text-left">
-               <span className="block font-black text-sm">نظام فليكسو AI</span>
-               <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">خبير استراتيجي</span>
+               <span className="block font-black text-sm">{gameMode === 'system' ? 'نظام فليكسو AI' : 'صديق منافس'}</span>
+               <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">{gameMode === 'system' ? 'خبير استراتيجي' : 'قيد الانتظار'}</span>
              </div>
              <div className="w-14 h-14 rounded-2xl border-2 border-indigo-500 p-0.5 shadow-[0_0_20px_rgba(79,70,229,0.3)]">
                 <div className="w-full h-full rounded-2xl bg-black flex items-center justify-center">
-                   <Brain size={28} className="text-indigo-400" />
+                   {gameMode === 'system' ? <Brain size={28} className="text-indigo-400" /> : <User size={28} className="text-gray-600" />}
                 </div>
              </div>
           </div>
         </div>
 
-        {/* رقعة الشطرنج الفخمة */}
+        {/* Color Customization */}
+        <div className="flex items-center space-x-3 space-x-reverse mb-6 overflow-x-auto no-scrollbar pb-2">
+           <Palette size={16} className="text-gray-500 shrink-0" />
+           {colors.map((c) => (
+             <button 
+               key={c.class}
+               onClick={() => setPieceColor(c.class)}
+               className={`shrink-0 px-4 py-2 rounded-xl text-[8px] font-black border transition-all ${pieceColor === c.class ? 'bg-white/10 border-white/30 text-white' : 'bg-white/5 border-transparent text-gray-500'}`}
+             >
+                <div className={`w-2 h-2 rounded-full mb-1 mx-auto ${c.class.replace('text', 'bg')}`}></div>
+                {c.label}
+             </button>
+           ))}
+        </div>
+
         <div className="aspect-square w-full max-w-[500px] mx-auto grid grid-cols-8 grid-rows-8 border-4 border-yellow-500/20 rounded-xl overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.8)] relative">
           {initialBoard.map((row, rIdx) => (
             row.map((piece, cIdx) => (
@@ -95,9 +139,8 @@ const ChessArena: React.FC = () => {
                   (rIdx + cIdx) % 2 === 0 ? 'bg-[#1a1a1a]' : 'bg-[#0a0a0a]'
                 } ${selectedPiece === piece && piece !== '' ? 'bg-yellow-500/20' : ''}`}
               >
-                {/* تمثيل القطع كأيقونات ذهبية لامعة */}
                 <span className={`
-                  ${rIdx < 2 ? 'text-pink-500 drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]' : 'text-yellow-500 drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]'}
+                  ${rIdx < 2 ? 'text-pink-500 drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]' : pieceColor + ' drop-shadow-[0_0_10px_rgba(245,158,11,0.8)]'}
                   font-serif hover:scale-125 transition-transform
                 `}>
                   {piece}
@@ -116,7 +159,6 @@ const ChessArena: React.FC = () => {
           )}
         </div>
 
-        {/* أزرار التحكم والجمهور */}
         <div className="mt-8 grid grid-cols-3 gap-4">
            <button onClick={inviteFollowers} className="py-4 bg-white/5 border border-white/10 rounded-2xl flex flex-col items-center space-y-2 hover:bg-white/10 transition-all active:scale-95">
               <Share2 size={20} className="text-blue-400" />
@@ -133,7 +175,6 @@ const ChessArena: React.FC = () => {
         </div>
       </div>
 
-      {/* الشريط الجانبي: التعليقات والجمهور */}
       <div className="w-full md:w-80 bg-black/40 backdrop-blur-xl border-r border-white/5 flex flex-col h-[400px] md:h-full mt-auto md:mt-0">
          <div className="p-5 border-b border-white/10 flex items-center space-x-2 space-x-reverse">
             <MessageSquare size={18} className="text-gray-500" />
