@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon } from 'lucide-react';
+import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import GlobalSearch from './GlobalSearch';
@@ -29,9 +29,8 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
     document.body.classList.toggle('light-mode');
   };
 
-  const isAdmin = currentUser?.celebrityTier === 0;
-
   const menuItems = [
+    { label: 'الخبير المشرف', icon: <Wand2 size={10} />, path: '/overseer', color: 'text-yellow-400' },
     { label: 'المخطط السيادي', icon: <Scale size={10} />, path: '/blueprint', color: 'text-pink-400' },
     { label: 'بورصة فليكسو', icon: <TrendingUp size={10} />, path: '/stocks', color: 'text-purple-400' },
     { label: 'الهوية الضوئية', icon: <BadgeCheck size={10} />, path: '/identity', color: 'text-pink-500' },
@@ -75,7 +74,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
 
-      {/* Floating Messenger - Compact */}
+      {/* Floating Messenger (Left Side) - Compact */}
       <div className="fixed bottom-20 left-4 z-[150] flex flex-col items-center">
         {isChatOpen && (
           <div className="mb-2 bg-black/80 backdrop-blur-2xl border border-pink-500/20 rounded-xl p-1.5 flex flex-col space-y-1 shadow-2xl animate-fade-in w-24">
@@ -92,6 +91,17 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
         <button onClick={() => setIsChatOpen(!isChatOpen)} className="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-lg active-tap border border-white/20">
           <MessageCircle size={14} />
         </button>
+      </div>
+
+      {/* Floating Overseer Quick Access (Right Side) - NEW FEATURE */}
+      <div className="fixed bottom-20 right-4 z-[150] flex flex-col items-center">
+         <button 
+           onClick={() => navigate('/overseer')} 
+           className="w-8 h-8 rounded-full bg-yellow-500 text-black flex items-center justify-center shadow-lg active-tap border border-black/10 relative"
+         >
+           <Wand2 size={14} />
+           <div className="absolute inset-0 rounded-full border-2 border-yellow-400 animate-ping opacity-20"></div>
+         </button>
       </div>
 
       {/* Sidebar - Compact Menu */}

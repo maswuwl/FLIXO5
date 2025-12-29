@@ -25,6 +25,7 @@ import Ports from './pages/Ports';
 import Charter from './pages/Charter';
 import SovereignStocks from './pages/SovereignStocks';
 import DigitalIdentity from './pages/DigitalIdentity';
+import OverseerExpert from './pages/OverseerExpert';
 import { authService } from './services/authService';
 
 const App: React.FC = () => {
@@ -65,6 +66,7 @@ const App: React.FC = () => {
                   <Route path="/stocks" element={<SovereignStocks />} />
                   <Route path="/identity" element={<DigitalIdentity />} />
                   <Route path="/ai-buddy" element={<AIBuddy />} />
+                  <Route path="/overseer" element={<OverseerExpert />} />
                   <Route path="/blueprint" element={<Blueprint />} />
                   <Route path="/community" element={<Community />} />
                   <Route path="/ports" element={<Ports />} />
