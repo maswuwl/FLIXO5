@@ -16,7 +16,7 @@ const GlobalSearch: React.FC = () => {
   const SETTINGS_REGISTRY = [
     { label: 'تغيير المظهر (ليلي/نهاري)', path: '/settings', icon: <SettingsIcon size={14} /> },
     { label: 'إدارة الخصوصية والأمان', path: '/settings', icon: <SettingsIcon size={14} /> },
-    { label: 'إزالة العلامة المائية', path: '/create', icon: <SettingsIcon size={14} /> },
+    { label: 'إدارة العلامة المائية', path: '/create', icon: <SettingsIcon size={14} /> },
     { label: 'القبو السيادي', path: '/vault', icon: <SettingsIcon size={14} /> }
   ];
 
@@ -49,8 +49,11 @@ const GlobalSearch: React.FC = () => {
 
   if (!isOpen) {
     return (
-      <button onClick={() => setIsOpen(true)} className="p-3 bg-white/5 border border-white/10 rounded-2xl text-gray-400 hover:text-white transition-all active:scale-90">
-        <Search size={20} />
+      <button 
+        onClick={() => setIsOpen(true)} 
+        className="p-3 bg-white/5 border border-white/10 rounded-2xl text-gray-400 hover:text-white hover:bg-pink-500/20 hover:scale-110 transition-all active:scale-90 animate-pulse-glow"
+      >
+        <Search size={20} className="animate-search-vibrate" />
       </button>
     );
   }
@@ -60,9 +63,9 @@ const GlobalSearch: React.FC = () => {
       <div className="flex items-center space-x-4 space-x-reverse mb-8">
         <div className="relative flex-1">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-          <input autoFocus type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ابحث عن ميزة، مبدع، أو إعداد..." className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-12 pl-4 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm" />
+          <input autoFocus type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ابحث عن ميزة، مبدع، أو إعداد..." className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-12 pl-4 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm shadow-2xl" />
         </div>
-        <button onClick={() => setIsOpen(false)} className="p-4 bg-white/5 rounded-2xl text-white"><X size={20} /></button>
+        <button onClick={() => setIsOpen(false)} className="p-4 bg-white/5 rounded-2xl text-white hover:bg-red-500/20 transition-colors"><X size={20} /></button>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-8 no-scrollbar pb-10">
@@ -71,9 +74,10 @@ const GlobalSearch: React.FC = () => {
             <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-4 px-2">الإعدادات والواجهات</h4>
             <div className="space-y-2">
               {results.settings.map((s, i) => (
-                <button key={i} onClick={() => { navigate(s.path); setIsOpen(false); }} className="w-full flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                <button key={i} onClick={() => { navigate(s.path); setIsOpen(false); }} className="w-full flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-indigo-500/10 transition-all group">
                    <div className="flex items-center space-x-3 space-x-reverse">
-                      {s.icon} <span className="text-xs font-bold text-gray-300">{s.label}</span>
+                      <div className="hover-violent-shake">{s.icon}</div>
+                      <span className="text-xs font-bold text-gray-300 group-hover:text-white">{s.label}</span>
                    </div>
                    <Sparkles size={12} className="text-indigo-400" />
                 </button>
@@ -87,9 +91,9 @@ const GlobalSearch: React.FC = () => {
               <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-4 px-2">المبدعون</h4>
               <div className="space-y-3">
                 {results.users.map(u => (
-                  <div key={u.id} className="flex items-center justify-between p-4 bg-white/5 rounded-[25px] border border-white/5">
+                  <div key={u.id} className="flex items-center justify-between p-4 bg-white/5 rounded-[25px] border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
                     <div className="flex items-center space-x-3 space-x-reverse">
-                      <img src={u.avatar} className="w-10 h-10 rounded-full object-cover" />
+                      <img src={u.avatar} className="w-10 h-10 rounded-full object-cover border border-white/10 group-hover:scale-110 transition-transform" />
                       <span className="text-sm font-black text-white">{u.displayName}</span>
                     </div>
                   </div>
@@ -104,7 +108,7 @@ const GlobalSearch: React.FC = () => {
             {isAnalyzing ? <p className="text-xs text-gray-500">جاري تحليل النقص عبر الذكاء السيادي...</p> : (
               <div className="space-y-4 max-w-sm">
                 <p className="text-sm font-black italic text-indigo-400 leading-relaxed">{aiInsight}</p>
-                <button onClick={() => { navigate('/settings', { state: { suggestion: `طلب إضافة ميزة: ${query}` } }); setIsOpen(false); }} className="px-8 py-4 flixo-gradient rounded-2xl font-black text-xs text-white shadow-xl">اطلب ميزة سيادية بناءً على بحثك</button>
+                <button onClick={() => { navigate('/settings', { state: { suggestion: `طلب إضافة ميزة: ${query}` } }); setIsOpen(false); }} className="px-8 py-4 flixo-gradient rounded-2xl font-black text-xs text-white shadow-xl hover:scale-105 transition-transform">اطلب ميزة سيادية بناءً على بحثك</button>
               </div>
             )}
           </div>

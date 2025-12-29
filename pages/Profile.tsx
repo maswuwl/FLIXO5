@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { ShieldCheck, Camera, X, ChevronLeft, Save, CheckCircle2, MapPin, Calendar, Link as LinkIcon, Edit3, User, Brain, ShieldAlert, BadgeCheck } from 'lucide-react';
+import { ShieldCheck, Camera, X, ChevronLeft, Save, CheckCircle2, MapPin, Calendar, Link as LinkIcon, Edit3, User, Brain, ShieldAlert, BadgeCheck, Upload } from 'lucide-react';
 import { MOCK_USERS } from '../constants';
 import CelebrityBadge from '../components/CelebrityBadge';
 import ProfileGuard from '../components/ProfileGuard';
@@ -9,6 +9,7 @@ import { authService } from '../services/authService';
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState(() => authService.getCurrentUser() || MOCK_USERS[0]);
   
@@ -17,6 +18,24 @@ const Profile: React.FC = () => {
   const [hasChanges, setHasChanges] = useState(false);
 
   const isAdmin = user.celebrityTier === 0;
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUser(prev => ({ ...prev, avatar: reader.result as string }));
+        setHasChanges(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = () => {
     setIsSaving(true);
@@ -40,17 +59,33 @@ const Profile: React.FC = () => {
         </div>
         
         <div className="absolute bottom-0 left-1/2 translate-x-1/2 translate-y-1/2 flex flex-col items-center">
-          <div className="relative">
+          <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
             <ProfileGuard isActive={true} size="lg" isSovereign={isAdmin}>
-              <div className={`w-36 h-36 rounded-full p-1.5 ${isAdmin ? 'bg-yellow-500 shadow-2xl shadow-yellow-500/20' : 'flixo-gradient'}`}>
+              <div className={`w-36 h-36 rounded-full p-1.5 transition-all duration-500 ${isAdmin ? 'bg-yellow-500 shadow-2xl shadow-yellow-500/20' : 'flixo-gradient'} ${isEditing ? 'ring-4 ring-indigo-500 ring-offset-4 ring-offset-black scale-105' : ''}`}>
                 <img src={user.avatar} className="w-full h-full rounded-full border-4 border-black object-cover" alt="Profile" />
+                
+                {isEditing && (
+                  <div className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center backdrop-blur-[2px] border-4 border-dashed border-white/30 animate-pulse">
+                    <Camera size={32} className="text-white mb-1" />
+                    <span className="text-[8px] font-black text-white uppercase tracking-widest">تغيير الصورة</span>
+                  </div>
+                )}
               </div>
             </ProfileGuard>
+            
             {!isEditing && (
               <div className="absolute -bottom-2 -right-2 bg-indigo-600 p-2 rounded-full border-2 border-black shadow-lg">
                 <BadgeCheck size={18} className="text-white" />
               </div>
             )}
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleFileChange} 
+            />
           </div>
         </div>
       </div>
@@ -98,6 +133,11 @@ const Profile: React.FC = () => {
                 <h3 className="text-2xl font-black italic text-indigo-400">تحديث الهوية</h3>
                 <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full font-black">الوضع الآمن</span>
              </div>
+
+             <div className="p-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl flex items-center space-x-3 space-x-reverse">
+                <Upload size={16} className="text-indigo-400" />
+                <p className="text-[9px] text-gray-400 font-bold italic">نصيحة: اضغط على صورتك الشخصية بالأعلى لاختيار صورة فخمة تليق بسيادتك.</p>
+             </div>
              
              <div className="bg-white/5 border border-white/10 rounded-[40px] p-8 space-y-6 shadow-2xl">
                 <div className="space-y-2">
@@ -135,7 +175,7 @@ const Profile: React.FC = () => {
                 >
                   {isSaving ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <><Save size={20} /> <span>حفظ السجلات</span></>}
                 </button>
-                <button onClick={() => setIsEditing(false)} className="px-10 py-6 bg-white/5 border border-white/10 rounded-[30px] font-black text-xs text-gray-500">إلغاء</button>
+                <button onClick={() => { setIsEditing(false); setUser(authService.getCurrentUser() || user); }} className="px-10 py-6 bg-white/5 border border-white/10 rounded-[30px] font-black text-xs text-gray-500">إلغاء</button>
              </div>
           </div>
         )}

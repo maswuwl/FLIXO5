@@ -6,51 +6,77 @@ export const MOCK_USERS: User[] = [
     id: 'admin_khalid',
     username: 'khalid_almontaser',
     displayName: 'خالد المنتصر',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=KhalidYemen',
-    cover: 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=800&auto=format&fit=crop',
-    bio: 'المدير التنفيذي والمؤسس لمنصة FLIXO. القوة والسيادة من قلب اليمن. 👑🇾🇪',
-    followers: 10000000,
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=KhalidAdmin',
+    cover: 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200',
+    bio: 'المدير السيادي والمطور الأول. نبني مستقبل اليمن الرقمي بشموخ. 🇾🇪👑',
+    followers: 12500000,
     following: 0,
-    likes: 50000000,
+    likes: 58000000,
     isVerified: true,
     isPlatformChannel: true,
     celebrityTier: 0,
-    referralCode: 'YEMEN-KHALID'
+    referralCode: 'KHALID-KING'
   },
   {
-    id: 'official_flixo',
+    id: 'flixo_official',
     username: 'flixo_official',
-    displayName: 'FLIXO اليمن',
-    avatar: 'https://api.dicebear.com/7.x/shapes/svg?seed=flixo_yemen',
+    displayName: 'فليكسو اليمن',
+    avatar: 'https://api.dicebear.com/7.x/shapes/svg?seed=flixo_yemen_v6',
     followers: 50000000,
     following: 1,
-    likes: 100000000,
+    likes: 120000000,
     isVerified: true,
     isPlatformChannel: true,
     celebrityTier: 0,
-    bio: 'المنصة الرسمية لـ FLIXO - صوت اليمن للعالم.'
+    bio: 'المنصة الرسمية والوحيدة لـ FLIXO. القوة والسيادة من تعز إلى كل العالم.'
+  },
+  {
+    id: 'sara_yemen',
+    username: 'sara_creative',
+    displayName: 'سارة اليمنية',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SaraYemen',
+    followers: 850000,
+    following: 120,
+    likes: 4200000,
+    isVerified: true,
+    celebrityTier: 2,
+    bio: 'مبدعة محتوى في عالم فليكسو. أعشق الفن والذكاء الاصطناعي.'
   }
-];
-
-export const MOCK_GIFTS: Gift[] = [
-  { id: 'g1', name: 'الجنبية اليمانية', icon: '⚔️', price: 1000, type: '3d' },
-  { id: 'g2', name: 'تاج السيادة', icon: '👑', price: 500, type: 'animated' },
-  { id: 'g3', name: 'البن اليماني', icon: '☕', price: 10, type: 'static' },
 ];
 
 export const MOCK_FEED: ContentItem[] = [
   {
-    id: 'khalid_intro',
+    id: 'post_1',
     type: 'video',
     author: MOCK_USERS[0],
-    content: 'أهلاً بكم في فليكسو.. مستقبل اليمن الرقمي بين أيديكم. #خالد_المنتصر #اليمن #فليكسو',
-    mediaUrl: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=800&q=80',
-    likes: 1500000,
-    comments: 25000,
-    shares: 100000,
-    saves: 200000,
+    content: 'نحن لا نبني مجرد تطبيق، نحن نبني إمبراطورية رقمية تعزز السيادة الوطنية. فليكسو هو المستقبل! 🇾🇪🚀',
+    mediaUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+    likes: 2400000,
+    comments: 45000,
+    shares: 120000,
+    saves: 300000,
     timestamp: 'الآن',
     isFeaturedByPlatform: true,
-    tags: ['خالد_المنتصر', 'اليمن', 'السيادة']
+    tags: ['خالد_المنتصر', 'اليمن', 'سيادة_فليكسو']
+  },
+  {
+    id: 'post_2',
+    type: 'image',
+    author: MOCK_USERS[2],
+    content: 'أجواء خيالية اليوم بفضل فلاتر فليكسو الذكية! شكراً خالد المنتصر على هذا الإبداع. ✨',
+    mediaUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=1200&q=80',
+    likes: 85000,
+    comments: 1200,
+    shares: 5400,
+    saves: 12000,
+    timestamp: 'منذ ساعة',
+    tags: ['إبداع', 'فليكسو_ماركت']
   }
+];
+
+export const MOCK_GIFTS: Gift[] = [
+  { id: 'g1', name: 'الجنبية الملكية', icon: '⚔️', price: 2000, type: '3d' },
+  { id: 'g2', name: 'التاج السيادي', icon: '👑', price: 1000, type: 'animated' },
+  { id: 'g3', name: 'البن اليماني', icon: '☕', price: 50, type: 'static' },
+  { id: 'g4', name: 'البخور التعزي', icon: '🔥', price: 500, type: 'static' }
 ];

@@ -4,81 +4,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FLIXO - السيادة اليمانية</title>
+    <title>FLIXO - Ethereal Order 4</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/svg?seed=flixo">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --flixo-purple: #7C3AED;
             --flixo-pink: #EC4899;
-            --flixo-orange: #F59E0B;
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --yemen-red: #CE1126;
-            --yemen-white: #FFFFFF;
-            --yemen-black: #000000;
+            --flixo-purple: #8B5CF6;
+            --flixo-indigo: #6366F1;
+            --bg-ethereal: #050208;
         }
         
         body {
-            font-family: 'Cairo', 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-ethereal);
+            color: white;
             margin: 0; padding: 0; overflow: hidden;
             user-select: none; -webkit-tap-highlight-color: transparent;
             height: 100vh; width: 100vw;
             position: fixed;
         }
 
+        /* Aura Background */
+        .aura-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: var(--bg-ethereal);
+            overflow: hidden;
+        }
+
+        .glow-orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(120px); opacity: 0.3;
+            animation: orb-move 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: var(--flixo-pink); top: -100px; left: -100px; }
+        .orb-2 { width: 350px; height: 350px; background: var(--flixo-purple); bottom: -100px; right: -50px; animation-delay: -5s; }
+        .orb-3 { width: 300px; height: 300px; background: var(--flixo-indigo); top: 40%; left: 60%; animation-delay: -10s; }
+
+        @keyframes orb-move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 50px) scale(1.3); }
+        }
+
+        /* --- احترافية الحركة السيادية --- */
+        
+        /* اهتزاز شعار العلامة المائية (FX Vibe) */
+        @keyframes fx-vibe {
+            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 10px var(--flixo-pink)); }
+            10% { transform: scale(1.1) rotate(-10deg); filter: drop-shadow(0 0 20px var(--flixo-purple)); }
+            20% { transform: scale(1.1) rotate(10deg); filter: drop-shadow(0 0 15px var(--flixo-pink)); }
+            30% { transform: scale(1.2) rotate(-15deg); filter: drop-shadow(0 0 25px var(--flixo-purple)); }
+            40% { transform: scale(1.2) rotate(15deg); filter: drop-shadow(0 0 20px var(--flixo-pink)); }
+            50% { transform: scale(1.3) rotate(0deg); filter: drop-shadow(0 0 30px var(--flixo-purple)); }
+        }
+        .animate-fx-vibe {
+            animation: fx-vibe 0.6s infinite linear;
+        }
+
+        /* رقصة الهدايا (Tango Style) */
+        @keyframes tango-dance {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            10% { transform: rotate(-10deg) scale(1.1); }
+            20% { transform: rotate(10deg) scale(1.1); }
+            30% { transform: rotate(-10deg) scale(1.1); }
+            40% { transform: rotate(10deg) scale(1.1); }
+            50% { transform: rotate(0deg) scale(1.2); }
+        }
+        .animate-tango-dance { 
+            animation: tango-dance 2s infinite ease-in-out; 
+            transform-origin: center bottom;
+        }
+
+        /* الاهتزاز الجنوني (Insane Mode) */
+        @keyframes insane-vibration {
+            0% { transform: rotate(0) scale(1.1); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(15deg) scale(1.2); }
+            20%, 40%, 60%, 80% { transform: rotate(-15deg) scale(1.2); }
+            100% { transform: rotate(0) scale(1.1); }
+        }
+        .animate-insane { 
+            animation: insane-vibration 0.3s infinite linear;
+            filter: drop-shadow(0 0 10px var(--flixo-pink));
+        }
+
+        /* الاهتزاز الهادئ (Normal Mode) */
+        @keyframes gentle-sway {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+        .animate-gentle { animation: gentle-sway 3s infinite ease-in-out; }
+
+        /* اهتزاز البحث والتنزيل */
+        @keyframes pulse-vibe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(2deg); }
+        }
+        .animate-pulse-vibe { animation: pulse-vibe 1.5s infinite ease-in-out; }
+
+        .active-tap:active { transform: scale(0.9); transition: transform 0.1s; }
+
         #splash-screen {
             position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-            z-index: 9999; transition: opacity 0.6s ease-out, visibility 0.6s;
-            background-color: black;
-            overflow: hidden;
-            pointer-events: auto;
-        }
-
-        .splash-content {
-            text-align: center;
-            position: relative;
-            z-index: 10;
-            animation: zoomIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes zoomIn {
-            from { transform: scale(0.85); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .flixo-gradient {
-            background: linear-gradient(45deg, var(--flixo-purple), var(--flixo-pink), var(--flixo-orange));
+            z-index: 9999; transition: all 1.2s cubic-bezier(0.85, 0, 0.15, 1);
+            background: #000;
         }
 
         #splash-screen.hidden { 
-            opacity: 0; 
-            visibility: hidden;
-            pointer-events: none; 
+            opacity: 0; visibility: hidden; transform: translateY(-100%);
         }
 
-        .sovereign-copyright {
-            position: fixed; bottom: 40px; width: 100%; text-align: center;
-            font-size: 8px; font-weight: 900; color: rgba(255,255,255,0.1);
-            letter-spacing: 0.5em; text-transform: uppercase; pointer-events: none; z-index: 5;
+        .flixo-text-gradient {
+            background: linear-gradient(to right, #fff, var(--flixo-pink), var(--flixo-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        #root {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
+        .glass-order4 {
+            background: rgba(20, 10, 30, 0.6);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(236, 72, 153, 0.15);
         }
 
-        * {
-            -webkit-overflow-scrolling: touch;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 <script type="importmap">
 {
@@ -94,38 +148,28 @@
 </script>
 </head>
 <body>
+    <div class="aura-bg">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
     <div id="splash-screen">
-        <div class="splash-content">
-            <div class="w-24 h-24 flixo-gradient rounded-[2.5rem] flex items-center justify-center mb-6 mx-auto rotate-12 shadow-[0_0_80px_rgba(124,58,237,0.6)]">
-                <span style="font-family: 'Inter'; font-weight: 900; font-size: 3rem; color: white;">FX</span>
+        <div class="text-center">
+            <div class="w-40 h-40 bg-gradient-to-tr from-pink-500 to-purple-600 rounded-[3.5rem] flex items-center justify-center mb-8 mx-auto shadow-[0_0_60px_rgba(236,72,153,0.5)] animate-pulse">
+                <span style="font-family: 'Inter'; font-weight: 900; font-size: 5rem; color: white; letter-spacing: -6px;">FX</span>
             </div>
-            <h1 class="text-6xl font-black italic tracking-tighter text-white">FLIXO</h1>
-            <p class="mt-4 text-white/60 font-black uppercase tracking-[0.4em] text-[10px]">خالد المنتصر • السيادة اليمانية</p>
+            <h1 class="text-7xl font-black italic tracking-tighter text-white">FLIXO</h1>
+            <p class="mt-6 text-pink-400 font-black uppercase tracking-[0.8em] text-[10px] opacity-70">SOVEREIGN SYSTEM • AUTO-SYNC</p>
         </div>
     </div>
-    
-    <div class="sovereign-copyright">ابتكار يماني أصيل للمطور خالد المنتصر</div>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
-                if (splash) {
-                    splash.classList.add('hidden');
-                    setTimeout(() => {
-                        splash.style.display = 'none';
-                    }, 600);
-                }
-            }, 2500);
-        });
-
-        window.addEventListener('load', () => {
-            const splash = document.getElementById('splash-screen');
-            if (splash && !splash.classList.contains('hidden')) {
-                splash.classList.add('hidden');
-                setTimeout(() => splash.style.display = 'none', 600);
-            }
+                if (splash) splash.classList.add('hidden');
+            }, 2000);
         });
     </script>
 </body>

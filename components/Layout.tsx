@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, X, Brain, Wallet, Cable, Scale, Gamepad2, Newspaper, ShieldCheck, Sun, Moon, LogOut, Settings, LayoutDashboard, Layout, Users, TrendingUp, BadgeCheck, ShieldAlert } from 'lucide-react';
+import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import AppDownloadBanner from './AppDownloadBanner';
 import { authService } from '../services/authService';
+import GlobalSearch from './GlobalSearch';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,140 +12,141 @@ interface LayoutProps {
 const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentPath = location.pathname;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [hasNewNotification, setHasNewNotification] = useState(true);
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
 
   useEffect(() => {
-    const handleUpdate = () => {
-      setCurrentUser(authService.getCurrentUser());
-    };
+    const handleUpdate = () => setCurrentUser(authService.getCurrentUser());
     window.addEventListener('userUpdate', handleUpdate);
     return () => window.removeEventListener('userUpdate', handleUpdate);
   }, []);
 
-  const isActive = (path: string) => currentPath === path;
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.toggle('light-mode');
-  };
-
-  const handleLogout = () => {
-    authService.logout();
-  };
-
-  const menuItems = [
-    { label: 'المخطط السيادي', icon: <Layout size={20} />, path: '/blueprint', special: 'blueprint' },
-    { label: 'بورصة فليكسو', icon: <TrendingUp size={20} />, path: '/stocks', special: 'stocks' },
-    { label: 'الهوية السيادية', icon: <BadgeCheck size={20} />, path: '/identity', special: 'identity' },
-    { label: 'خبير فليكسو الشامل', icon: <Brain size={20} />, path: '/ai-studio', special: 'universal-ai' },
-    { label: 'مجتمع فليكسو', icon: <Users size={20} />, path: '/community', special: 'community' },
-    { label: 'المحفظة السيادية', icon: <Wallet size={20} />, path: '/wallet', special: 'wallet' },
-    { label: 'بوابات العبور (API)', icon: <Cable size={20} />, path: '/ports' },
-    { label: 'ميثاق السيادة', icon: <Scale size={20} />, path: '/charter' },
-    { label: 'غرفة الأخبار الملكية', icon: <Newspaper size={20} />, path: '/newsroom' },
-    { label: 'القبو السيادي', icon: <ShieldCheck size={20} />, path: '/vault', special: 'vault' },
-  ];
-
   const isAdmin = currentUser?.celebrityTier === 0;
 
+  const menuItems = [
+    { label: 'المخطط السيادي', icon: <Scale size={20} />, path: '/blueprint', color: 'text-pink-400' },
+    { label: 'بورصة فليكسو', icon: <TrendingUp size={20} />, path: '/stocks', color: 'text-purple-400' },
+    { label: 'الهوية الضوئية', icon: <BadgeCheck size={20} />, path: '/identity', color: 'text-pink-500' },
+    { label: 'مختبر الأكواد', icon: <Brain size={20} />, path: '/ai-studio', color: 'text-indigo-400' },
+    { label: 'خزنة FX', icon: <Wallet size={20} />, path: '/wallet', color: 'text-pink-600' },
+    { label: 'غرفة الأخبار', icon: <Newspaper size={20} />, path: '/newsroom', color: 'text-red-400' },
+    { label: 'بوابات العبور', icon: <Cable size={20} />, path: '/ports', color: 'text-cyan-400' },
+  ];
+
   return (
-    <div className={`relative h-screen flex flex-col overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-transparent text-white' : 'bg-slate-50/80 text-slate-900'}`} dir="rtl">
-      <AppDownloadBanner />
-
-      {isMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[110]" onClick={toggleMenu}></div>
-      )}
-
-      <button id="sidebar-toggle-btn" onClick={toggleMenu} className="hidden"></button>
-
-      <div className={`fixed top-0 left-0 h-full w-80 border-r z-[120] transition-transform duration-500 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl ${isDarkMode ? 'bg-[#0a0a0c]/95 border-white/10' : 'bg-white border-black/5'}`}>
-        <div className="p-6 flex flex-col h-full">
-          <div className="flex justify-between items-center mb-10">
-            <button onClick={toggleMenu} className={`p-2.5 rounded-2xl transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}><X size={24} /></button>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <span className={`text-2xl font-black italic tracking-tighter ${isDarkMode ? 'text-white' : 'text-black'}`}>FLIXO</span>
-              <div className="w-10 h-10 flixo-gradient rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-black text-xl">FX</span>
-              </div>
-            </div>
+    <div className="relative h-screen flex flex-col overflow-hidden bg-transparent" dir="rtl">
+      
+      {/* Header */}
+      <header className="h-24 flex items-center justify-between px-8 z-[100] relative bg-black/20 backdrop-blur-md border-b border-white/5">
+        <div className="flex items-center space-x-4 space-x-reverse">
+          <button onClick={() => setIsMenuOpen(true)} className="w-12 h-12 glass-order4 rounded-2xl flex items-center justify-center active-tap border border-white/10">
+            <LayoutDashboard size={24} className="text-pink-400" />
+          </button>
+          <button onClick={() => navigate('/nearby')} className="w-12 h-12 glass-order4 rounded-2xl flex items-center justify-center text-indigo-400 active-tap border border-white/10">
+            <Radar size={22} className="animate-pulse-vibe" />
+          </button>
+        </div>
+        
+        <div className="flex items-center space-x-3 space-x-reverse cursor-pointer active-tap group" onClick={() => navigate('/')}>
+          <div className="w-11 h-11 bg-gradient-to-tr from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-[0_0_25px_rgba(236,72,153,0.4)] group-hover:rotate-12 transition-all">
+            <span className="text-white font-black text-xl">FX</span>
           </div>
+          <h1 className="text-3xl font-black italic flixo-text-gradient tracking-tighter">FLIXO</h1>
+        </div>
 
-          {/* معلومات المستخدم مع الرتبة */}
-          <div className="mb-8 p-5 bg-white/5 rounded-[30px] border border-white/10 flex items-center space-x-4 space-x-reverse relative overflow-hidden group">
-            <div className={`absolute inset-0 ${isAdmin ? 'bg-yellow-500/10' : 'bg-indigo-600/5'} opacity-0 group-hover:opacity-100 transition-opacity`}></div>
-            <img src={currentUser?.avatar} className={`w-12 h-12 rounded-full border-2 ${isAdmin ? 'border-yellow-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'border-pink-500'} object-cover relative z-10`} />
-            <div className="overflow-hidden relative z-10">
-               <div className="flex items-center space-x-2 space-x-reverse">
-                  <p className="font-black text-sm truncate text-white">{currentUser?.displayName}</p>
-                  {isAdmin && <ShieldAlert size={12} className="text-yellow-500 animate-pulse" />}
-               </div>
-               <p className={`text-[9px] font-black uppercase tracking-widest ${isAdmin ? 'text-yellow-500' : 'text-gray-500'}`}>
-                  {isAdmin ? 'مدير المنصة السيادي' : 'مستكشف في فليكسو'}
-               </p>
-            </div>
-          </div>
-
-          <div className="space-y-3 flex-1 overflow-y-auto no-scrollbar pr-1">
-            <p className="text-[9px] text-gray-600 font-black uppercase tracking-[0.3em] mb-4 px-2">نظام فليكسو المركزي</p>
-            {menuItems.map((item, idx) => (
-              <button 
-                key={idx}
-                onClick={() => { navigate(item.path); toggleMenu(); }}
-                className={`w-full flex items-center space-x-4 space-x-reverse p-4 rounded-2xl transition-all active:scale-95 ${
-                  item.special === 'blueprint' ? 'bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-black mb-2 shadow-lg' :
-                  item.special === 'identity' ? 'bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 font-black mb-2 shadow-xl' :
-                  isDarkMode ? 'hover:bg-white/5 text-gray-400 hover:text-white' : 'hover:bg-black/5 text-gray-700'
-                }`}
-              >
-                <div className="text-current">{item.icon}</div>
-                <span className="text-[11px] font-black tracking-tight">{item.label}</span>
-              </button>
-            ))}
-            
-            {isAdmin && (
-              <button 
-                onClick={() => { navigate('/admin'); toggleMenu(); }}
-                className="w-full flex items-center space-x-4 space-x-reverse p-4 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 font-black transition-all"
-              >
-                <LayoutDashboard size={20} />
-                <span className="text-[11px] font-black tracking-tight">غرفة العمليات (Admin)</span>
-              </button>
-            )}
-          </div>
-
-          <div className="pt-6 border-t border-white/10 space-y-2">
-            <button 
-              onClick={handleLogout}
-              className="w-full flex items-center space-x-4 space-x-reverse p-4 rounded-2xl transition-all text-red-500 hover:bg-red-500/10 font-black text-[11px]"
-            >
-              <LogOut size={18} />
-              <span>خروج سيادي آمن</span>
-            </button>
+        <div className="flex items-center space-x-4 space-x-reverse">
+          <GlobalSearch />
+          <button 
+            onClick={() => { navigate('/notifications'); setHasNewNotification(false); }} 
+            className="relative w-12 h-12 glass-order4 rounded-2xl flex items-center justify-center text-gray-400 active-tap border border-white/10"
+          >
+            <Bell size={24} className={hasNewNotification ? 'animate-insane text-pink-500' : 'animate-gentle'} />
+            {hasNewNotification && <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-pink-500 rounded-full border-2 border-black animate-ping"></div>}
+          </button>
+          <div onClick={() => navigate('/profile')} className={`w-12 h-12 rounded-2xl border-2 p-0.5 cursor-pointer active-tap ${isAdmin ? 'border-pink-500' : 'border-white/10'}`}>
+            <img src={currentUser?.avatar} className="w-full h-full rounded-xl object-cover" />
           </div>
         </div>
-      </div>
+      </header>
 
-      <main className="flex-1 relative bg-transparent overflow-hidden">
+      {/* Main Content */}
+      <main className="flex-1 relative overflow-hidden">
         {children}
       </main>
 
-      <nav className={`h-20 backdrop-blur-3xl border-t flex items-center justify-around px-2 z-[90] transition-colors ${isDarkMode ? 'bg-black/40 border-white/5' : 'bg-white/90 border-black/5'}`}>
-        <button onClick={() => navigate('/')} className={`flex-1 flex flex-col items-center ${isActive('/') ? 'text-white' : 'text-gray-600'}`}>
-          <Home size={22} /><span className="text-[9px] font-black">الرئيسية</span>
-        </button>
-        <button onClick={() => navigate('/create')} className="flex-1 flex flex-col items-center -mt-8">
-          <div className="w-14 h-14 flixo-gradient rounded-full flex items-center justify-center shadow-2xl border-4 border-black">
-            <Plus size={30} className="text-white" strokeWidth={3} />
+      {/* Messenger Style Chat Bubble (Icon in Icon) */}
+      <div className="fixed bottom-32 left-8 z-[150] flex flex-col items-center">
+        {isChatOpen && (
+          <div className="mb-4 bg-black/80 backdrop-blur-2xl border border-pink-500/20 rounded-[2.5rem] p-3 flex flex-col space-y-3 shadow-2xl animate-fade-in w-48">
+             <button onClick={() => { navigate('/ai-buddy'); setIsChatOpen(false); }} className="flex items-center space-x-3 space-x-reverse p-3 hover:bg-white/5 rounded-2xl transition-all">
+                <div className="w-10 h-10 bg-indigo-600/20 rounded-xl flex items-center justify-center text-indigo-400"><Cpu size={18} /></div>
+                <span className="text-[10px] font-black text-white">خبير فليكسو</span>
+             </button>
+             <button onClick={() => { navigate('/inbox'); setIsChatOpen(false); }} className="flex items-center space-x-3 space-x-reverse p-3 hover:bg-white/5 rounded-2xl transition-all">
+                <div className="w-10 h-10 bg-pink-600/20 rounded-xl flex items-center justify-center text-pink-400"><MessageCircle size={18} /></div>
+                <span className="text-[10px] font-black text-white">الرسائل</span>
+             </button>
+          </div>
+        )}
+        <button 
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className={`relative w-16 h-16 rounded-full flex items-center justify-center shadow-[0_10px_40px_rgba(236,72,153,0.5)] active-tap border-2 border-white/20 ${isChatOpen ? 'bg-white text-black' : 'bg-pink-500 text-white animate-bounce'}`}
+        >
+          <MessageCircle size={32} />
+          {/* الأيقونة المدمجة (Messenger Style) */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+             <Zap size={12} fill="currentColor" className={`transition-all duration-500 ${isChatOpen ? 'scale-0' : 'scale-100 opacity-60'}`} />
           </div>
         </button>
-        <button onClick={() => navigate('/profile')} className={`flex-1 flex flex-col items-center ${isActive('/profile') ? 'text-white' : 'text-gray-600'}`}>
-          <Users size={22} /><span className="text-[9px] font-black">حسابي</span>
-        </button>
-      </nav>
+      </div>
+
+      {/* Sidebar */}
+      <aside className={`fixed top-0 left-0 h-full w-[340px] glass-order4 z-[120] transition-transform duration-700 ease-in-out transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-pink-500/20`}>
+        <div className="p-10 flex flex-col h-full">
+          <div className="flex justify-between items-center mb-10">
+            <span className="text-[10px] font-black uppercase text-pink-500 tracking-widest flex items-center"><Sparkles size={14} className="ml-2" /> Sovereign Menu</span>
+            <button onClick={() => setIsMenuOpen(false)} className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-gray-500 hover:text-white transition-colors"><X size={24} /></button>
+          </div>
+
+          <nav className="space-y-1 flex-1 overflow-y-auto no-scrollbar">
+            {menuItems.map((item, idx) => (
+              <button 
+                key={idx}
+                onClick={() => { navigate(item.path); setIsMenuOpen(false); }}
+                className="w-full flex items-center space-x-4 space-x-reverse p-4 rounded-2xl hover:bg-white/5 transition-all group active-tap"
+              >
+                <div className={`${item.color} p-2 bg-white/5 rounded-xl`}>{item.icon}</div>
+                <span className="text-sm font-bold text-gray-400 group-hover:text-white">{item.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          <button onClick={() => authService.logout()} className="mt-6 w-full py-4 rounded-2xl bg-red-500/10 text-red-500 font-black text-xs uppercase tracking-widest active-tap">End Session</button>
+        </div>
+      </aside>
+
+      {/* Bottom Nav */}
+      <div className="fixed bottom-10 left-0 right-0 flex justify-center z-[110] px-6">
+        <nav className="h-20 glass-order4 rounded-[2.5rem] border border-pink-500/20 flex items-center justify-between px-6 shadow-2xl w-full max-w-lg">
+          {[
+            { id: '/', icon: <Home size={24} /> },
+            { id: '/market', icon: <ShoppingBag size={24} /> },
+            { id: '/create', icon: <Plus size={32} />, special: true },
+            { id: '/inbox', icon: <MessageCircle size={24} /> },
+            { id: '/profile', icon: <UserCircle size={24} /> }
+          ].map((item) => (
+            <button 
+              key={item.id}
+              onClick={() => navigate(item.id)}
+              className={`p-4 transition-all active-tap ${item.special ? '-mt-16 bg-pink-500 text-white rounded-[2rem] shadow-2xl scale-110' : location.pathname === item.id ? 'text-pink-400' : 'text-gray-500 hover:text-white'}`}
+            >
+              {item.icon}
+            </button>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 };
