@@ -1,11 +1,17 @@
 
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { Type, Modality } from "@google/genai";
+
+// تحسين: استدعاء المكتبة بشكل ديناميكي داخل الوظائف لتقليل حجم ملف index.js الرئيسي
+const getAIProvider = async () => {
+  const { GoogleGenAI } = await import("@google/genai");
+  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+};
 
 export const geminiService = {
   // استشارة الخبير الذكي مع دعم التفكير العميق والبحث
   async askExpert(prompt: string, history: any[] = []) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
 
       const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
@@ -29,7 +35,7 @@ export const geminiService = {
   // إصلاح أخطاء المستودع برمجياً
   async fixRepositoryErrors(fileName: string, errorRate: number) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
         contents: `قم بإصلاح ملف ${fileName} برمجياً وفقاً لمعايير خالد المنتصر السيادية. نسبة الخطأ ${errorRate}%. استخرج حلاً جذرياً بمواصفات تكنولوجية عالمية.`,
@@ -42,7 +48,7 @@ export const geminiService = {
   // البحث عن المواقع الشهيرة والحيوية القريبة باستخدام Google Maps Grounding
   async findLocalVibes(latitude: number, longitude: number) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash-lite-latest",
         contents: "ما هي أكثر المواقع شهرة وحيوية في هذا الموقع الجغرافي حالياً؟ اقترح 3 أماكن مميزة بأسلوب فخم يليق بمدير فليكسو.",
@@ -66,7 +72,7 @@ export const geminiService = {
   // ترجمة الرسائل بأسلوب سيادي
   async translateMessage(text: string) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `ترجم الرسالة التالية إلى العربية بأسلوب فخم وراقي واحترافي جداً: "${text}"`,
@@ -80,7 +86,7 @@ export const geminiService = {
   // تحليل الأخبار استراتيجياً
   async analyzeNews(topic: string) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `قم بتحليل هذا الخبر استراتيجياً لمستقبل منصة فليكسو واقتراح خطوات عملية عالمية للمدير خالد المنتصر: "${topic}"`,
@@ -94,7 +100,7 @@ export const geminiService = {
   // تحويل النص إلى كلام (نطق الأخبار)
   async speakNews(text: string) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: `بصوت فخم ووقور جداً، اقرأ بوضوح: ${text}` }] }],
@@ -148,7 +154,7 @@ export const geminiService = {
   // تحليل الاقتراحات وإرجاع بيانات JSON منظمة
   async analyzeSuggestion(suggestion: string) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `حلل هذا الاقتراح برمجياً واستراتيجياً لمنصة فليكسو واذكر رأيك للمدير خالد المنتصر: "${suggestion}"`,
@@ -175,7 +181,7 @@ export const geminiService = {
   // تحليل عمليات البحث غير الناجحة
   async analyzeSearchQuery(query: string) {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `المستخدم بحث عن "${query}" ولم يجد نتائج. قدم تفسيراً ذكياً وفخماً يعزز الثقة بالمنصة ويعد بميزات مستقبلية سيادية.`,
@@ -189,7 +195,7 @@ export const geminiService = {
   // توليد فيديو سيادي باستخدام Veo
   async generateSovereignVideo(prompt: string, aspectRatio: '16:9' | '9:16' = '9:16') {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = await getAIProvider();
       let operation = await ai.models.generateVideos({
         model: 'veo-3.1-fast-generate-preview',
         prompt: `A high-quality, world-class video for FLIXO platform: ${prompt}`,

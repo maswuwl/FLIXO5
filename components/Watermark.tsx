@@ -13,7 +13,7 @@ const Watermark: React.FC<WatermarkProps> = () => {
   return (
     <div className="absolute bottom-24 right-4 z-50 pointer-events-none select-none">
       <div className="flex flex-col items-center group">
-        {/* الشعار الراقص السيادي فقط */}
+        {/* الشعار الراقص السيادي فقط - العودة للمظهر الرسمي قبل 40 دقيقة */}
         <div className="flex space-x-0.5 items-center relative" dir="ltr">
           {["F","L","I","X","O"].map((char, i) => (
             <div key={i} className="relative dancing-letter" style={{ animationDelay: `${i * 0.1}s` }}>
