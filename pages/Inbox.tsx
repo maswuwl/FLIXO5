@@ -4,9 +4,11 @@ import { Search, MoreVertical, Languages, Send, X, Shield, Clock, Sparkles, Cpu,
 import { geminiService } from '../services/geminiService';
 import { MOCK_USERS } from '../constants';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 
 const Inbox: React.FC = () => {
   const navigate = useNavigate();
+  const currentUser = authService.getCurrentUser();
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
   const [ephemeralMessages, setEphemeralMessages] = useState<any[]>([]);
   const [inputText, setInputText] = useState('');
@@ -15,7 +17,6 @@ const Inbox: React.FC = () => {
     { id: 2, sender: MOCK_USERS[1], text: 'Merci pour le cadeau hier! 🎉', time: 'Yesterday', avatar: MOCK_USERS[1].avatar, translated: '' }
   ]);
 
-  // التحكم في ظهور عناصر الواجهة الرئيسية عند فتح محادثة
   useEffect(() => {
     if (selectedChat) {
       document.body.classList.add('in-chat-mode');
@@ -46,7 +47,6 @@ const Inbox: React.FC = () => {
   if (selectedChat) {
     return (
       <div className="fixed inset-0 z-[500] bg-black flex flex-col animate-fade-in" dir="rtl">
-        {/* Chat Header - Full Width */}
         <div className="p-4 pt-12 border-b border-white/10 flex items-center justify-between bg-black/80 backdrop-blur-2xl">
           <div className="flex items-center">
             <button onClick={() => setSelectedChat(null)} className="ml-4 p-2 hover:bg-white/5 rounded-full transition-colors">
@@ -67,7 +67,6 @@ const Inbox: React.FC = () => {
           </button>
         </div>
 
-        {/* Message Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar pb-32">
           <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
             <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
@@ -83,6 +82,9 @@ const Inbox: React.FC = () => {
               key={msg.id} 
               className={`flex flex-col ${msg.senderId === 'current-user' ? 'items-start' : 'items-end'} animate-slide-up`}
             >
+              <div className="flex items-center space-x-2 space-x-reverse mb-1">
+                 {msg.senderId === 'current-user' && <img src={currentUser?.avatar} className="w-4 h-4 rounded-full border border-pink-500/30" />}
+              </div>
               <div className={`max-w-[85%] p-4 rounded-3xl text-xs font-bold leading-relaxed shadow-xl ${
                 msg.senderId === 'current-user' ? 'bg-pink-600 text-white rounded-tl-none border border-white/10' : 'bg-white/10 text-white rounded-tr-none border border-white/5'
               }`}>
@@ -103,7 +105,6 @@ const Inbox: React.FC = () => {
           ))}
         </div>
 
-        {/* Unified Input Area with Mirror Text */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/90 backdrop-blur-3xl border-t border-white/10 z-[600]">
           <div className="flex items-center space-x-2 space-x-reverse max-w-4xl mx-auto">
             <div className="flex-1 relative">
@@ -116,6 +117,9 @@ const Inbox: React.FC = () => {
                 placeholder="اكتب رسالة سيادية..." 
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-pink-500 transition-all placeholder:text-gray-600 shadow-inner"
               />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full overflow-hidden border border-white/20">
+                 <img src={currentUser?.avatar} className="w-full h-full object-cover" />
+              </div>
             </div>
             <button 
               onClick={handleSendMessage}
@@ -124,18 +128,6 @@ const Inbox: React.FC = () => {
             >
               <Send size={20} />
             </button>
-          </div>
-
-          {/* Mirror Text Feature - تظهر تحت زر الكتابة/الشريط لرؤية ما يتم كتابته بوضوح */}
-          <div className="mt-2 h-6 flex items-center justify-center px-4 overflow-hidden pointer-events-none">
-            {inputText && (
-              <div className="flex items-center space-x-2 space-x-reverse bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full animate-fade-in max-w-full">
-                <div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse"></div>
-                <span className="text-[10px] font-black text-pink-400 italic truncate tracking-wide">
-                  {inputText}
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -164,7 +156,6 @@ const Inbox: React.FC = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
-        {/* FLIXO AI Expert Sticky Row */}
         <div 
           onClick={() => navigate('/ai-studio')}
           className="flex items-center p-5 bg-pink-500/5 border-b border-pink-500/10 hover:bg-pink-500/10 transition-colors cursor-pointer group"
@@ -189,7 +180,6 @@ const Inbox: React.FC = () => {
           </div>
         </div>
 
-        {/* Regular Chats */}
         {chats.map((chat) => (
           <div 
             key={chat.id} 
