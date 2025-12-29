@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { authService } from '../services/authService';
-import { ShieldCheck, UserPlus, LogIn, Chrome, Lock, Sparkles, KeyRound, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, UserPlus, LogIn, Chrome, Lock, Sparkles, KeyRound, ArrowLeft, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 
 interface AuthProps {
   onLoginSuccess: () => void;
@@ -42,113 +42,165 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-black flex flex-col items-center justify-center p-6 overflow-hidden" dir="rtl">
-      {/* Dynamic Background Glow */}
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 blur-[150px] rounded-full animate-pulse"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-pink-600/10 blur-[150px] rounded-full animate-pulse delay-700"></div>
+    <div className="fixed inset-0 z-[1000] bg-[#f0f2f5] dark:bg-[#050208] flex flex-col items-center justify-center p-4 md:p-12 overflow-y-auto no-scrollbar" dir="rtl">
+      {/* Background Orbs (Dark Mode Only) */}
+      <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="hidden dark:block absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-600/5 blur-[120px] rounded-full pointer-events-none"></div>
 
-      <div className="w-full max-w-md relative z-10 space-y-8 animate-fade-in">
-        <div className="text-center">
-          <div className="w-24 h-24 flixo-gradient rounded-[2.8rem] flex items-center justify-center mx-auto mb-6 rotate-12 shadow-[0_0_80px_rgba(124,58,237,0.5)] border border-white/20 active-tap transition-transform">
-            <span className="text-white font-black text-4xl">FX</span>
+      <div className="w-full max-w-6xl flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 z-10">
+        
+        {/* Left Side: Branding (Desktop) */}
+        <div className="hidden md:flex flex-col text-right max-w-lg space-y-4 animate-fade-in">
+          <h1 className="text-6xl font-black italic tracking-tighter flixo-text-gradient">FLIXO</h1>
+          <p className="text-2xl font-bold text-gray-800 dark:text-gray-200 leading-tight">
+            فليكسو يساعدك على التواصل مع المبدعين ومشاركة لحظاتك السيادية مع العالم.
+          </p>
+          <div className="flex items-center space-x-2 space-x-reverse pt-4 text-gray-500">
+             <ShieldCheck size={20} className="text-green-500" />
+             <span className="text-sm font-black">نظام خالد المنتصر للأمان الرقمي</span>
           </div>
-          <h1 className="text-5xl font-black italic tracking-tighter text-white">FLIXO</h1>
-          <p className="text-gray-500 font-bold text-[9px] uppercase tracking-[0.4em] mt-2">خالد المنتصر • بوابة السيادة اليمانية</p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[45px] p-8 shadow-2xl space-y-6">
-          <div className="flex bg-white/5 p-1 rounded-2xl mb-2">
-            <button 
-              onClick={() => { setMode('login'); setError(null); }} 
-              className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all active-tap ${mode === 'login' ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-500'}`}
-            >
-              دخول سيادي
-            </button>
-            <button 
-              onClick={() => { setMode('register'); setError(null); }} 
-              className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all active-tap ${mode === 'register' ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-500'}`}
-            >
-              تأسيس هوية
-            </button>
+        {/* Right Side: Auth Form */}
+        <div className="w-full max-w-md animate-slide-up">
+          {/* Mobile Logo */}
+          <div className="md:hidden text-center mb-8">
+            <h1 className="text-5xl font-black italic tracking-tighter flixo-text-gradient">FLIXO</h1>
+            <p className="text-gray-500 font-bold text-xs mt-2">بوابة السيادة اليمانية</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-3">
-                {mode === 'register' && (
-                  <input 
-                    type="text" 
-                    placeholder="الاسم المعروض للهوية" 
-                    required 
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all text-right" 
-                    value={formData.displayName} 
-                    onChange={(e) => setFormData({...formData, displayName: e.target.value})} 
-                  />
-                )}
-                <div className="relative group">
-                  <input 
-                      type="text" 
-                      placeholder="اسم المستخدم" 
-                      required 
-                      className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pr-12 pl-6 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all text-right" 
-                      value={formData.username} 
-                      onChange={(e) => setFormData({...formData, username: e.target.value})} 
-                  />
-                  <ShieldCheck className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-indigo-500 transition-colors" size={18} />
-                </div>
+          <div className="bg-white dark:bg-[#140a1e] border border-gray-200 dark:border-white/10 rounded-[2rem] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)] space-y-6">
+            
+            {mode === 'login' ? (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input 
+                  type="text" 
+                  placeholder="اسم المستخدم أو البريد السيادي" 
+                  required 
+                  className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-2xl py-4 px-5 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" 
+                  value={formData.username} 
+                  onChange={(e) => setFormData({...formData, username: e.target.value})} 
+                />
                 
                 <div className="relative group">
                   <input 
-                      type={showPassword ? "text" : "password"} 
-                      placeholder="مفتاح السيادة (كلمة المرور)" 
-                      required 
-                      className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pr-12 pl-12 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all text-right" 
-                      value={formData.password} 
-                      onChange={(e) => setFormData({...formData, password: e.target.value})} 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="كلمة السر" 
+                    required 
+                    className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-2xl py-4 px-5 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" 
+                    value={formData.password} 
+                    onChange={(e) => setFormData({...formData, password: e.target.value})} 
                   />
-                  <KeyRound className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-indigo-500 transition-colors" size={18} />
-                  
-                  {/* زر إظهار وإخفاء كلمة المرور */}
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors active-tap p-1"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-500 transition-colors"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
-            </div>
 
-            {error && <p className="text-[10px] text-red-500 font-black text-center animate-bounce">{error}</p>}
+                <button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center"
+                >
+                  {isLoading ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : 'تسجيل الدخول'}
+                </button>
 
-            <button type="submit" disabled={isLoading} className="w-full py-5 flixo-gradient rounded-[28px] text-white font-black text-sm shadow-xl active:scale-95 transition-all flex items-center justify-center">
-              {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div> : 
-                <><LogIn size={18} className="ml-2" /> {mode === 'login' ? 'فتح بوابة السيادة' : 'تأسيس الهوية الآن'}</>
-              }
-            </button>
+                <div className="text-center">
+                  <button type="button" className="text-indigo-600 dark:text-indigo-400 text-xs font-bold hover:underline">هل نسيت كلمة السر؟</button>
+                </div>
 
-            <div className="relative flex items-center py-2">
-                <div className="flex-grow border-t border-white/5"></div>
-                <span className="flex-shrink mx-4 text-[9px] text-gray-600 font-black uppercase tracking-widest">عبر السحابة السيادية</span>
-                <div className="flex-grow border-t border-white/5"></div>
-            </div>
+                <div className="relative flex items-center py-4">
+                  <div className="flex-grow border-t border-gray-200 dark:border-white/10"></div>
+                  <span className="flex-shrink mx-4 text-xs text-gray-400 font-bold uppercase tracking-widest">أو</span>
+                  <div className="flex-grow border-t border-gray-200 dark:border-white/10"></div>
+                </div>
 
-            <button 
+                {/* Create Account Button - Facebook Style */}
+                <div className="text-center pt-2">
+                  <button 
+                    type="button"
+                    onClick={() => { setMode('register'); setError(null); }}
+                    className="px-8 py-4 bg-[#42b72a] hover:bg-[#36a420] text-white font-black text-sm rounded-2xl shadow-xl shadow-green-500/10 active:scale-95 transition-all"
+                  >
+                    إنشاء حساب جديد في فليكسو
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
+                <div className="flex justify-between items-center mb-2">
+                   <h2 className="text-xl font-black text-gray-800 dark:text-white">انضم للإمبراطورية</h2>
+                   <button type="button" onClick={() => setMode('login')} className="text-indigo-600 dark:text-indigo-400 text-xs font-bold flex items-center">
+                     <ArrowLeft size={14} className="ml-1" /> العودة للدخول
+                   </button>
+                </div>
+                
+                <input 
+                  type="text" 
+                  placeholder="الاسم الكامل" 
+                  required 
+                  className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-2xl py-4 px-5 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" 
+                  value={formData.displayName} 
+                  onChange={(e) => setFormData({...formData, displayName: e.target.value})} 
+                />
+                
+                <input 
+                  type="text" 
+                  placeholder="اسم المستخدم الفريد" 
+                  required 
+                  className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-2xl py-4 px-5 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" 
+                  value={formData.username} 
+                  onChange={(e) => setFormData({...formData, username: e.target.value})} 
+                />
+                
+                <input 
+                  type="password" 
+                  placeholder="كلمة السر الجديدة" 
+                  required 
+                  className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-2xl py-4 px-5 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" 
+                  value={formData.password} 
+                  onChange={(e) => setFormData({...formData, password: e.target.value})} 
+                />
+
+                <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl text-[10px] text-gray-500 leading-relaxed font-bold">
+                  بالنقر على "تسجيل"، فإنك توافق على شروطنا وسياسة البيانات وسياسة ملفات تعريف الارتباط. قد تتلقى إشعارات سيادية منا عبر البريد.
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="w-full py-4 bg-[#42b72a] hover:bg-[#36a420] text-white font-black text-lg rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center"
+                >
+                  {isLoading ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : 'تسجيل في فليكسو'}
+                </button>
+              </form>
+            )}
+
+            {error && <p className="text-xs text-red-500 font-black text-center animate-bounce">{error}</p>}
+
+            <div className="pt-4 flex flex-col items-center space-y-4">
+              <button 
                 type="button" 
                 onClick={handleGoogleLogin}
-                className="w-full py-4 bg-white text-black rounded-[25px] font-black text-xs flex items-center justify-center space-x-3 space-x-reverse hover:bg-gray-100 active-tap shadow-lg transition-all"
-            >
+                className="w-full py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-xs font-black text-gray-600 dark:text-white flex items-center justify-center space-x-2 space-x-reverse hover:bg-gray-50 dark:hover:bg-white/10 transition-all"
+              >
                 <Chrome size={18} className="text-red-500" />
-                <span>دخول سريع عبر Google</span>
-            </button>
-          </form>
-        </div>
-        
-        <div className="flex flex-col items-center space-y-4 opacity-40">
-           <div className="flex items-center space-x-2 space-x-reverse">
-             <ShieldCheck size={12} className="text-green-500" />
-             <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">تشفير KHALID-SEC V6 نشط</span>
-           </div>
-           <p className="text-[7px] text-gray-600 font-bold uppercase tracking-[0.4em] text-center">ابتكار يماني أصيل • جميع الحقوق محفوظة لسيادة خالد المنتصر</p>
+                <span>المتابعة عبر Google</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center text-[10px] text-gray-500 font-bold uppercase tracking-widest space-y-2">
+            <p>خالد المنتصر • بوابة السيادة اليمانية V6.2</p>
+            <div className="flex justify-center space-x-4 space-x-reverse opacity-60">
+              <button className="hover:underline">عن فليكسو</button>
+              <button className="hover:underline">المساعدة</button>
+              <button className="hover:underline">المطورين</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
