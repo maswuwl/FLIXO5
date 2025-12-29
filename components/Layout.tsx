@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2, Gamepad2, Users } from 'lucide-react';
+import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2, Gamepad2, Users, Languages } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import GlobalSearch from './GlobalSearch';
@@ -33,6 +33,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
     { label: 'الخبير المشرف', icon: <Wand2 size={10} />, path: '/overseer', color: 'text-yellow-400' },
     { label: 'ساحة الألعاب', icon: <Gamepad2 size={10} />, path: '/chess', color: 'text-green-400' },
     { label: 'المجتمعات', icon: <Users size={10} />, path: '/groups', color: 'text-blue-400' },
+    { label: 'اللغة', icon: <Languages size={10} />, path: '#', color: 'text-cyan-400' },
     { label: 'المخطط السيادي', icon: <Scale size={10} />, path: '/blueprint', color: 'text-pink-400' },
     { label: 'بورصة فليكسو', icon: <TrendingUp size={10} />, path: '/stocks', color: 'text-purple-400' },
     { label: 'الهوية الضوئية', icon: <BadgeCheck size={10} />, path: '/identity', color: 'text-pink-500' },
@@ -104,7 +105,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
              onClick={() => navigate('/overseer')} 
              className="w-8 h-8 rounded-full bg-yellow-500 text-black flex items-center justify-center shadow-lg active-tap border border-black/10 relative"
            >
-             <Wand2 size={14} />
+             < Wand2 size={14} />
              <div className="absolute inset-0 rounded-full border-2 border-yellow-400 animate-ping opacity-20"></div>
            </button>
         </div>
@@ -119,7 +120,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
 
           <nav className="space-y-0.5 flex-1 overflow-y-auto no-scrollbar">
             {menuItems.map((item, idx) => (
-              <button key={idx} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-white/5 transition-all group">
+              <button key={idx} onClick={() => { if(item.path !== '#') navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-white/5 transition-all group">
                 <div className={`${item.color} p-1 bg-white/5 rounded-md`}>{item.icon}</div>
                 <span className="text-[10px] font-bold">{item.label}</span>
               </button>
