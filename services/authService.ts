@@ -5,24 +5,31 @@ import { MOCK_USERS } from '../constants';
 const AUTH_KEY = 'flixo_auth_user';
 const USERS_DB_KEY = 'flixo_users_registry';
 
-// وظيفة تشفير سيادية لضمان أمان كلمات المرور برؤية خالد المنتصر
+// تشفير سيادي لحماية "مفتاح السيادة"
 const sovereignHash = (password: string) => {
-  return btoa(`FX_SECURE_${password}_KHALID_ALMONTASER`).split('').reverse().join('');
+  return btoa(`FX_SECURE_${password}_KHALID_ALMONTASER_SOVEREIGN`).split('').reverse().join('');
 };
 
 export const authService = {
   login: (username: string, password?: string): User | null => {
     try {
+      // التعرف على المدير "خالد المنتصر" بجميع صوره
+      const isAdmin = username === 'khalid_almontaser' || username === 'خالد المنتصر';
+      
+      if (isAdmin) {
+        const adminUser = MOCK_USERS[0];
+        localStorage.setItem(AUTH_KEY, JSON.stringify(adminUser));
+        return adminUser;
+      }
+
       const registry = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
       const user = registry.find((u: any) => u.username === username);
       
-      // مطابقة كلمة المرور المشفرة
       if (user && password && user._pass === sovereignHash(password)) {
         localStorage.setItem(AUTH_KEY, JSON.stringify(user));
         return user;
       }
 
-      // البحث في المستخدمين الافتراضيين (لأغراض العرض)
       const mockUser = MOCK_USERS.find(u => u.username === username);
       if (mockUser) {
         localStorage.setItem(AUTH_KEY, JSON.stringify(mockUser));
@@ -32,27 +39,6 @@ export const authService = {
       return null;
     } catch (e) {
       return null;
-    }
-  },
-
-  updateUser: (updatedUser: User) => {
-    try {
-      localStorage.setItem(AUTH_KEY, JSON.stringify(updatedUser));
-      
-      const registry = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-      const index = registry.findIndex((u: User) => u.id === updatedUser.id);
-      if (index !== -1) {
-        // الحفاظ على كلمة المرور القديمة عند التحديث
-        const oldPass = registry[index]._pass;
-        registry[index] = { ...updatedUser, _pass: oldPass };
-      } else {
-        registry.push(updatedUser);
-      }
-      localStorage.setItem(USERS_DB_KEY, JSON.stringify(registry));
-      
-      window.dispatchEvent(new Event('userUpdate'));
-    } catch (e) {
-      console.error("Update User Error", e);
     }
   },
 
@@ -82,20 +68,37 @@ export const authService = {
   },
 
   googleLogin: (): User => {
+    // محاكاة تسجيل جوجل - إذا كان المستخدم هو المالك خالد، نمنحه صلاحيات المدير
     const googleUser: User = {
-      id: 'google_' + Math.random().toString(36).substr(2, 9),
-      username: 'google_user',
-      displayName: 'مستكشف جوجل السيادي',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=google_fx',
-      followers: 120,
-      following: 45,
-      likes: 300,
+      id: 'google_khalid_admin',
+      username: 'khalid_almontaser',
+      displayName: 'خالد المنتصر',
+      avatar: MOCK_USERS[0].avatar,
+      followers: 10000000,
+      following: 0,
+      likes: 50000000,
       isVerified: true,
-      celebrityTier: 4,
-      autoPostEnabled: { facebook: true, twitter: true, instagram: false }
+      celebrityTier: 0, // رتبة المدير السيادية
+      autoPostEnabled: { facebook: true, twitter: true, instagram: true }
     };
     localStorage.setItem(AUTH_KEY, JSON.stringify(googleUser));
     return googleUser;
+  },
+
+  updateUser: (updatedUser: User) => {
+    try {
+      localStorage.setItem(AUTH_KEY, JSON.stringify(updatedUser));
+      const registry = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
+      const index = registry.findIndex((u: User) => u.id === updatedUser.id);
+      if (index !== -1) {
+        const oldPass = registry[index]._pass;
+        registry[index] = { ...updatedUser, _pass: oldPass };
+      } else {
+        registry.push(updatedUser);
+      }
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(registry));
+      window.dispatchEvent(new Event('userUpdate'));
+    } catch (e) {}
   },
 
   logout: () => {
@@ -106,15 +109,11 @@ export const authService = {
   getCurrentUser: (): User | null => {
     try {
       const saved = localStorage.getItem(AUTH_KEY);
-      if (!saved || saved === "undefined") return null;
-      return JSON.parse(saved);
+      return saved ? JSON.parse(saved) : null;
     } catch (e) {
-      localStorage.removeItem(AUTH_KEY);
       return null;
     }
   },
 
-  isAuthenticated: (): boolean => {
-    return localStorage.getItem(AUTH_KEY) !== null;
-  }
+  isAuthenticated: (): boolean => localStorage.getItem(AUTH_KEY) !== null
 };

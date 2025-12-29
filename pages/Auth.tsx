@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { authService } from '../services/authService';
-import { ShieldCheck, UserPlus, LogIn, Chrome, Lock, Sparkles, KeyRound } from 'lucide-react';
+import { ShieldCheck, UserPlus, LogIn, Chrome, Lock, Sparkles, KeyRound, ArrowLeft } from 'lucide-react';
 
 interface AuthProps {
   onLoginSuccess: () => void;
@@ -19,16 +19,16 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
     
     setTimeout(() => {
-      let user;
-      if (mode === 'login') {
-        user = authService.login(formData.username, formData.password);
-        if (!user) setError("خطأ في البيانات أو المستخدم غير موجود سيادياً.");
-      } else {
-        user = authService.register(formData);
+      const user = mode === 'login' 
+        ? authService.login(formData.username, formData.password)
+        : authService.register(formData);
+        
+      if (!user && mode === 'login') {
+        setError("خطأ في بيانات السيادة، يرجى التحقق من المفتاح.");
+        setIsLoading(false);
+      } else if (user) {
+        onLoginSuccess();
       }
-      
-      setIsLoading(false);
-      if (user) onLoginSuccess();
     }, 1200);
   };
 
@@ -36,16 +36,17 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
     setTimeout(() => {
       authService.googleLogin();
-      setIsLoading(false);
       onLoginSuccess();
     }, 1500);
   };
 
   return (
     <div className="fixed inset-0 z-[1000] bg-black flex flex-col items-center justify-center p-6 overflow-hidden" dir="rtl">
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 blur-[150px] rounded-full"></div>
+      {/* Dynamic Background Glow */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 blur-[150px] rounded-full animate-pulse"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-pink-600/10 blur-[150px] rounded-full animate-pulse delay-700"></div>
 
-      <div className="w-full max-w-md relative z-10 space-y-8">
+      <div className="w-full max-w-md relative z-10 space-y-8 animate-fade-in">
         <div className="text-center">
           <div className="w-24 h-24 flixo-gradient rounded-[2.8rem] flex items-center justify-center mx-auto mb-6 rotate-12 shadow-[0_0_80px_rgba(124,58,237,0.5)] border border-white/20">
             <span className="text-white font-black text-4xl">FX</span>
@@ -54,13 +55,28 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
           <p className="text-gray-500 font-bold text-[9px] uppercase tracking-[0.4em] mt-2">خالد المنتصر • بوابة السيادة اليمانية</p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[45px] p-8 shadow-2xl">
+        <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[45px] p-8 shadow-2xl space-y-6">
+          <div className="flex bg-white/5 p-1 rounded-2xl mb-2">
+            <button 
+              onClick={() => setMode('login')} 
+              className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all ${mode === 'login' ? 'bg-indigo-600 text-white' : 'text-gray-500'}`}
+            >
+              دخول سيادي
+            </button>
+            <button 
+              onClick={() => setMode('register')} 
+              className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all ${mode === 'register' ? 'bg-indigo-600 text-white' : 'text-gray-500'}`}
+            >
+              تأسيس هوية
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-3">
                 {mode === 'register' && (
                   <input 
                     type="text" 
-                    placeholder="الاسم المعروض" 
+                    placeholder="الاسم المعروض للهوية" 
                     required 
                     className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all" 
                     value={formData.displayName} 
@@ -69,7 +85,7 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 )}
                 <input 
                     type="text" 
-                    placeholder="اسم المستخدم" 
+                    placeholder="اسم المستخدم (أو خالد المنتصر)" 
                     required 
                     className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-indigo-500" 
                     value={formData.username} 
@@ -78,7 +94,7 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 <div className="relative">
                   <input 
                       type="password" 
-                      placeholder="كلمة المرور المشفرة" 
+                      placeholder="مفتاح السيادة (كلمة المرور)" 
                       required 
                       className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white focus:outline-none focus:border-indigo-500" 
                       value={formData.password} 
@@ -88,17 +104,17 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 </div>
             </div>
 
-            {error && <p className="text-[10px] text-red-500 font-black text-center">{error}</p>}
+            {error && <p className="text-[10px] text-red-500 font-black text-center animate-bounce">{error}</p>}
 
             <button type="submit" disabled={isLoading} className="w-full py-5 flixo-gradient rounded-[28px] text-white font-black text-sm shadow-xl active:scale-95 transition-all">
               {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div> : 
-                <span>{mode === 'login' ? 'فتح بوابة السيادة' : 'تأسيس حساب سيادي'}</span>
+                <span className="flex items-center justify-center"><LogIn size={18} className="ml-2" /> {mode === 'login' ? 'فتح بوابة السيادة' : 'تأسيس الهوية الآن'}</span>
               }
             </button>
 
             <div className="relative flex items-center py-2">
                 <div className="flex-grow border-t border-white/5"></div>
-                <span className="flex-shrink mx-4 text-[9px] text-gray-600 font-black uppercase">أو التوثيق عبر</span>
+                <span className="flex-shrink mx-4 text-[9px] text-gray-600 font-black uppercase">عبر السحابة السيادية</span>
                 <div className="flex-grow border-t border-white/5"></div>
             </div>
 
@@ -108,18 +124,17 @@ const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 className="w-full py-4 bg-white text-black rounded-[25px] font-black text-xs flex items-center justify-center space-x-3 space-x-reverse hover:bg-gray-100 active:scale-95 shadow-lg"
             >
                 <Chrome size={18} className="text-red-500" />
-                <span>تسجيل عبر Google (سيادي)</span>
+                <span>دخول سريع عبر Google</span>
             </button>
           </form>
-
-          <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="w-full mt-6 text-indigo-400 font-black text-xs">
-            {mode === 'login' ? 'لا تملك حساباً؟ انضم للمنظومة' : 'لديك حساب سيادي؟ سجل دخولك'}
-          </button>
         </div>
         
-        <div className="flex items-center justify-center space-x-2 space-x-reverse opacity-40">
-           <ShieldCheck size={12} className="text-green-500" />
-           <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">تشفير KHALID-SEC V6 نشط</span>
+        <div className="flex flex-col items-center space-y-4 opacity-40">
+           <div className="flex items-center space-x-2 space-x-reverse">
+             <ShieldCheck size={12} className="text-green-500" />
+             <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">تشفير KHALID-SEC V6 نشط</span>
+           </div>
+           <p className="text-[7px] text-gray-600 font-bold uppercase tracking-[0.4em]">ابتكار يماني أصيل • جميع الحقوق محفوظة</p>
         </div>
       </div>
     </div>
