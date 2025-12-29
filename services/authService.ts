@@ -5,7 +5,6 @@ import { MOCK_USERS } from '../constants';
 const AUTH_KEY = 'flixo_auth_user';
 const USERS_DB_KEY = 'flixo_users_registry';
 
-// تشفير سيادي لحماية "مفتاح السيادة"
 const sovereignHash = (password: string) => {
   return btoa(`FX_SECURE_${password}_KHALID_ALMONTASER_SOVEREIGN`).split('').reverse().join('');
 };
@@ -13,8 +12,8 @@ const sovereignHash = (password: string) => {
 export const authService = {
   login: (username: string, password?: string): User | null => {
     try {
-      // التعرف على المدير "خالد المنتصر" بجميع صوره
       const isAdmin = username === 'khalid_almontaser' || username === 'خالد المنتصر';
+      const isFamily = username.includes('المنتصر') || username.toLowerCase().includes('almontaser');
       
       if (isAdmin) {
         const adminUser = MOCK_USERS[0];
@@ -23,9 +22,16 @@ export const authService = {
       }
 
       const registry = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-      const user = registry.find((u: any) => u.username === username);
+      let user = registry.find((u: any) => u.username === username);
       
       if (user && password && user._pass === sovereignHash(password)) {
+        if (isFamily) {
+          user.isVerified = true;
+          user.celebrityTier = 0;
+          if (!user.displayName.includes('👑')) {
+            user.displayName = `${user.displayName} 👑`;
+          }
+        }
         localStorage.setItem(AUTH_KEY, JSON.stringify(user));
         return user;
       }
@@ -43,19 +49,24 @@ export const authService = {
   },
 
   register: (data: any): User => {
+    const isFamily = 
+      (data.username && (data.username.includes('المنتصر') || data.username.toLowerCase().includes('almontaser'))) || 
+      (data.displayName && (data.displayName.includes('المنتصر') || data.displayName.toLowerCase().includes('almontaser')));
+    
     const newUser: User = {
       id: `u_${Date.now()}`,
       username: data.username,
-      displayName: data.displayName || data.username,
+      displayName: isFamily ? `${data.displayName || data.username} 👑` : (data.displayName || data.username),
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`,
-      followers: 0,
+      followers: isFamily ? 150000 : 0,
       following: 0,
-      likes: 0,
-      isVerified: false,
-      celebrityTier: 5,
+      likes: isFamily ? 500000 : 0,
+      isVerified: isFamily,
+      celebrityTier: isFamily ? 0 : 5,
       autoPostEnabled: { facebook: true, twitter: true, instagram: true },
-      bio: 'عضو جديد في إمبراطورية فليكسو السيادية.',
-      location: 'اليمن السعيد',
+      socialLinks: { linkedAssets: [] }, // تهيئة الأصول الرقمية
+      bio: isFamily ? 'عضو في الأسرة السيادية المؤسسة لمنصة فليكسو.' : 'عضو في مجتمع فليكسو العالمي.',
+      location: 'اليمن',
       birthDate: '2000-01-01'
     };
     
@@ -68,18 +79,18 @@ export const authService = {
   },
 
   googleLogin: (): User => {
-    // محاكاة تسجيل جوجل - إذا كان المستخدم هو المالك خالد، نمنحه صلاحيات المدير
     const googleUser: User = {
       id: 'google_khalid_admin',
       username: 'khalid_almontaser',
-      displayName: 'خالد المنتصر',
+      displayName: 'خالد المنتصر 👑',
       avatar: MOCK_USERS[0].avatar,
       followers: 10000000,
       following: 0,
       likes: 50000000,
       isVerified: true,
-      celebrityTier: 0, // رتبة المدير السيادية
-      autoPostEnabled: { facebook: true, twitter: true, instagram: true }
+      celebrityTier: 0,
+      autoPostEnabled: { facebook: true, twitter: true, instagram: true },
+      socialLinks: { linkedAssets: [] }
     };
     localStorage.setItem(AUTH_KEY, JSON.stringify(googleUser));
     return googleUser;
@@ -93,8 +104,6 @@ export const authService = {
       if (index !== -1) {
         const oldPass = registry[index]._pass;
         registry[index] = { ...updatedUser, _pass: oldPass };
-      } else {
-        registry.push(updatedUser);
       }
       localStorage.setItem(USERS_DB_KEY, JSON.stringify(registry));
       window.dispatchEvent(new Event('userUpdate'));
