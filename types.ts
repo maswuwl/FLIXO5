@@ -35,6 +35,9 @@ export interface User {
   id: string;
   username: string;
   displayName: string;
+  email?: string;
+  phone?: string;
+  gender?: 'male' | 'female' | 'other';
   avatar: string;
   cover?: string;
   bio?: string;

@@ -10,10 +10,9 @@ const sovereignHash = (password: string) => {
 };
 
 export const authService = {
-  login: (username: string, password?: string): User | null => {
+  login: (identifier: string, password?: string): User | null => {
     try {
-      const isAdmin = username === 'khalid_almontaser' || username === 'خالد المنتصر';
-      const isFamily = username.includes('المنتصر') || username.toLowerCase().includes('almontaser');
+      const isAdmin = identifier === 'khalid_almontaser' || identifier === 'خالد المنتصر';
       
       if (isAdmin) {
         const adminUser = MOCK_USERS[0];
@@ -22,21 +21,19 @@ export const authService = {
       }
 
       const registry = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');
-      let user = registry.find((u: any) => u.username === username);
+      // البحث عبر اسم المستخدم، البريد، أو الهاتف
+      let user = registry.find((u: any) => 
+        u.username === identifier || 
+        u.email === identifier || 
+        u.phone === identifier
+      );
       
       if (user && password && user._pass === sovereignHash(password)) {
-        if (isFamily) {
-          user.isVerified = true;
-          user.celebrityTier = 0;
-          if (!user.displayName.includes('👑')) {
-            user.displayName = `${user.displayName} 👑`;
-          }
-        }
         localStorage.setItem(AUTH_KEY, JSON.stringify(user));
         return user;
       }
 
-      const mockUser = MOCK_USERS.find(u => u.username === username);
+      const mockUser = MOCK_USERS.find(u => u.username === identifier);
       if (mockUser) {
         localStorage.setItem(AUTH_KEY, JSON.stringify(mockUser));
         return mockUser;
@@ -57,6 +54,9 @@ export const authService = {
       id: `u_${Date.now()}`,
       username: data.username,
       displayName: isFamily ? `${data.displayName || data.username} 👑` : (data.displayName || data.username),
+      email: data.email || undefined,
+      phone: data.phone || undefined,
+      gender: data.gender || 'male',
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`,
       followers: isFamily ? 150000 : 0,
       following: 0,
@@ -64,10 +64,10 @@ export const authService = {
       isVerified: isFamily,
       celebrityTier: isFamily ? 0 : 5,
       autoPostEnabled: { facebook: true, twitter: true, instagram: true },
-      socialLinks: { linkedAssets: [] }, // تهيئة الأصول الرقمية
+      socialLinks: { linkedAssets: [] },
       bio: isFamily ? 'عضو في الأسرة السيادية المؤسسة لمنصة فليكسو.' : 'عضو في مجتمع فليكسو العالمي.',
       location: 'اليمن',
-      birthDate: '2000-01-01'
+      birthDate: `${data.birthYear}-${data.birthMonth}-${data.birthDay}`
     };
     
     const registry = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '[]');

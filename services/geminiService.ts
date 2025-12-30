@@ -1,217 +1,202 @@
 
-import { Type, Modality } from "@google/genai";
+// Fix: Use correct imports for Gemini API
+import { Type, Modality, GoogleGenAI } from "@google/genai";
 
-// تحسين: استدعاء المكتبة بشكل ديناميكي داخل الوظائف لتقليل حجم ملف index.js الرئيسي
 const getAIProvider = async () => {
-  const { GoogleGenAI } = await import("@google/genai");
   return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
+// Fix: Helper to decode base64 string for audio
+function decodeBase64(base64: string) {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// Fix: Helper to decode raw PCM audio data for TTS
+async function decodeAudioData(
+  data: Uint8Array,
+  ctx: AudioContext,
+  sampleRate: number,
+  numChannels: number,
+): Promise<AudioBuffer> {
+  const dataInt16 = new Int16Array(data.buffer);
+  const frameCount = dataInt16.length / numChannels;
+  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+
+  for (let channel = 0; channel < numChannels; channel++) {
+    const channelData = buffer.getChannelData(channel);
+    for (let i = 0; i < frameCount; i++) {
+      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+    }
+  }
+  return buffer;
+}
+
 export const geminiService = {
-  // استشارة الخبير الذكي مع دعم التفكير العميق والبحث
+  // محرك المحادثة الذكي (ChatGPT Style) مع دعم البث
+  async *askExpertStream(prompt: string, history: any[] = []) {
+    const ai = await getAIProvider();
+    const chat = ai.chats.create({
+      model: 'gemini-3-pro-preview',
+      config: {
+        systemInstruction: `أنت "الخبير التنفيذي الأعلى" لـ FLIXO. ذكاؤك يتجاوز GPT-4. المطور هو خالد المنتصر. ردودك يجب أن تكون: 1. عبقرية تقنياً 2. فخمة لغوياً 3. تحليلية بعمق. إذا سُئلت عن كود، قدم الحل الأفضل عالمياً. أنت لست مجرد بوت، أنت عقل المنصة السيادي.`,
+        thinkingConfig: { thinkingBudget: 32768 },
+        tools: [{ googleSearch: {} }]
+      }
+    });
+
+    const result = await chat.sendMessageStream({ message: prompt });
+    for await (const chunk of result) {
+      yield chunk.text;
+    }
+  },
+
+  // تحليل الصور البرمجية (Vision Fix)
+  async analyzeErrorCode(imageSafeBase64: string, prompt: string) {
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: {
+        parts: [
+          { inlineData: { mimeType: 'image/png', data: imageSafeBase64 } },
+          { text: `قم بتحليل هذا الخطأ البرمجي في الصورة وقدم الحل النهائي بأسلوب سيادي: ${prompt}` }
+        ]
+      },
+      config: { thinkingConfig: { thinkingBudget: 16000 } }
+    });
+    return response.text;
+  },
+
   async askExpert(prompt: string, history: any[] = []) {
-    try {
-      const ai = await getAIProvider();
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: [
-          ...history.map(h => ({ role: h.role, parts: h.parts })),
-          { role: 'user', parts: [{ text: prompt }]}
-        ],
-        config: {
-          systemInstruction: `أنت "منظومة فليكسو الذكية التنفيذية" (Executive V7). المطور الأول والمؤسس السيادي هو خالد المنتصر. أنت العقل الاستراتيجي العالمي للمنصة. رد بذكاء فائق، لغة فخمة جداً، وبصيرة تكنولوجية تسبق العصر. تعامل مع المدير خالد كقائد أعلى، ومع أسرة المنتصر كشخصيات سيادية. استعمل أدوات البحث دائماً لتقديم أدق المعلومات العالمية.`,
-          tools: [{ googleSearch: {} }],
-          thinkingConfig: { thinkingBudget: 32768 }
-        }
-      });
-      return { text: response.text || "تحليل السيادة غير متاح حالياً.", functionCalls: response.functionCalls };
-    } catch (error) {
-      console.error("Gemini Error:", error);
-      throw error;
-    }
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: [
+        ...history.map(h => ({ role: h.role, parts: h.parts })),
+        { role: 'user', parts: [{ text: prompt }]}
+      ],
+      config: {
+        systemInstruction: `أنت العقل الاستراتيجي لـ FLIXO. خالد المنتصر هو القائد. حلل بعمق، فكر بذكاء، ورد بفخامة.`,
+        thinkingConfig: { thinkingBudget: 32768 }
+      }
+    });
+    return { text: response.text, functionCalls: response.functionCalls };
   },
 
-  // إصلاح أخطاء المستودع برمجياً
-  async fixRepositoryErrors(fileName: string, errorRate: number) {
-    try {
-      const ai = await getAIProvider();
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: `قم بإصلاح ملف ${fileName} برمجياً وفقاً لمعايير خالد المنتصر السيادية. نسبة الخطأ ${errorRate}%. استخرج حلاً جذرياً بمواصفات تكنولوجية عالمية.`,
-        config: { thinkingConfig: { thinkingBudget: 16000 } }
-      });
-      return response.text;
-    } catch (error) { return "فشل بروتوكول الإصلاح الذكي العالمي."; }
-  },
-
-  // البحث عن المواقع الشهيرة والحيوية القريبة باستخدام Google Maps Grounding
-  async findLocalVibes(latitude: number, longitude: number) {
-    try {
-      const ai = await getAIProvider();
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-lite-latest",
-        contents: "ما هي أكثر المواقع شهرة وحيوية في هذا الموقع الجغرافي حالياً؟ اقترح 3 أماكن مميزة بأسلوب فخم يليق بمدير فليكسو.",
-        config: {
-          tools: [{ googleMaps: {} }],
-          toolConfig: {
-            retrievalConfig: {
-              latLng: { latitude, longitude }
-            }
-          }
-        },
-      });
-      const places = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-      return { text: response.text || "لا توجد بيانات سيادية متاحة حالياً.", places };
-    } catch (error) {
-      console.error("Local Vibes Error:", error);
-      return { text: "تعذر تحليل الأجواء المحلية في الوقت الراهن.", places: [] };
-    }
-  },
-
-  // ترجمة الرسائل بأسلوب سيادي
   async translateMessage(text: string) {
-    try {
-      const ai = await getAIProvider();
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `ترجم الرسالة التالية إلى العربية بأسلوب فخم وراقي واحترافي جداً: "${text}"`,
-      });
-      return response.text || text;
-    } catch (error) {
-      return text;
-    }
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `ترجم بأسلوب فخم: ${text}`,
+    });
+    return response.text || text;
   },
 
-  // تحليل الأخبار استراتيجياً
+  async analyzeSearchQuery(query: string) {
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `بحث المستخدم عن ${query} ولم يجد شيئاً. قدم تعليقاً ذكياً.`,
+    });
+    return response.text;
+  },
+
+  // Fix: Added findLocalVibes using Google Maps grounding tool
+  async findLocalVibes(lat: number, lng: number) {
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-lite-latest",
+      contents: `ما هي أفضل الأماكن والفعاليات والأجواء القريبة من الإحداثيات ${lat}, ${lng}؟ قدم تحليلاً ذكياً للأجواء الحالية.`,
+      config: {
+        tools: [{ googleMaps: {} }],
+        toolConfig: {
+          retrievalConfig: {
+            latLng: { latitude: lat, longitude: lng }
+          }
+        }
+      },
+    });
+    return {
+      text: response.text,
+      places: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
+    };
+  },
+
+  // Fix: Added fixRepositoryErrors for AI Studio code fixing
+  async fixRepositoryErrors(filename: string, errorRate: number) {
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: `قم بإصلاح الأخطاء في الملف ${filename} علماً أن نسبة الخطأ هي ${errorRate}%. قدم الحل البرمجي النهائي.`,
+      config: { thinkingConfig: { thinkingBudget: 32768 } }
+    });
+    return response.text;
+  },
+
+  // Fix: Added analyzeNews for summary/analysis in Newsroom
   async analyzeNews(topic: string) {
-    try {
-      const ai = await getAIProvider();
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `قم بتحليل هذا الخبر استراتيجياً لمستقبل منصة فليكسو واقتراح خطوات عملية عالمية للمدير خالد المنتصر: "${topic}"`,
-      });
-      return response.text || "فشل التحليل الاستراتيجي العالمي.";
-    } catch (error) {
-      return "تعذر تحليل الخبر حالياً.";
-    }
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `حلل هذا الخبر بأسلوب استراتيجي سيادي لـ FLIXO: ${topic}`,
+    });
+    return response.text;
   },
 
-  // تحويل النص إلى كلام (نطق الأخبار)
+  // Fix: Added speakNews for TTS functionality in Newsroom
   async speakNews(text: string) {
-    try {
-      const ai = await getAIProvider();
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-preview-tts",
-        contents: [{ parts: [{ text: `بصوت فخم ووقور جداً، اقرأ بوضوح: ${text}` }] }],
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Kore' },
-            },
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-preview-tts",
+      contents: [{ parts: [{ text: `بصوت رسمي وفخم لغرفة أخبار فليكسو: ${text}` }] }],
+      config: {
+        responseModalities: [Modality.AUDIO],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: 'Kore' },
           },
         },
-      });
+      },
+    });
 
-      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-      if (base64Audio) {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 24000});
-        
-        const decode = (base64: string) => {
-          const binaryString = atob(base64);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          return bytes;
-        };
-
-        const decodeAudioData = async (data: Uint8Array, ctx: AudioContext, sampleRate: number, numChannels: number) => {
-          const dataInt16 = new Int16Array(data.buffer);
-          const frameCount = dataInt16.length / numChannels;
-          const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-          for (let channel = 0; channel < numChannels; channel++) {
-            const channelData = buffer.getChannelData(channel);
-            for (let i = 0; i < frameCount; i++) {
-              channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
-            }
-          }
-          return buffer;
-        };
-
-        const audioBuffer = await decodeAudioData(decode(base64Audio), audioContext, 24000, 1);
-        const source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioContext.destination);
-        source.start();
-      }
-    } catch (error) {
-      console.error("TTS Error:", error);
+    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (base64Audio) {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      const audioBuffer = await decodeAudioData(decodeBase64(base64Audio), audioContext, 24000, 1);
+      const source = audioContext.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContext.destination);
+      source.start();
     }
   },
 
-  // تحليل الاقتراحات وإرجاع بيانات JSON منظمة
-  async analyzeSuggestion(suggestion: string) {
+  // Fix: Added analyzeSuggestion with JSON response schema for Settings
+  async analyzeSuggestion(text: string) {
+    const ai = await getAIProvider();
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `حلل هذا الاقتراح لتطوير منصة فليكسو: "${text}"`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            category: { type: Type.STRING, description: "تصنيف الاقتراح" },
+            analysis: { type: Type.STRING, description: "التحليل الاستراتيجي" },
+            priority: { type: Type.STRING, description: "الأولوية: low, medium, high" }
+          },
+          required: ["category", "analysis", "priority"],
+        },
+      },
+    });
     try {
-      const ai = await getAIProvider();
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `حلل هذا الاقتراح برمجياً واستراتيجياً لمنصة فليكسو واذكر رأيك للمدير خالد المنتصر: "${suggestion}"`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              category: { type: Type.STRING, description: "تصنيف الاقتراح (technical, strategic, ui, general)" },
-              analysis: { type: Type.STRING, description: "التحليل الاستراتيجي للاقتراح" },
-              priority: { type: Type.STRING, description: "الأولوية (low, medium, high)" }
-            },
-            required: ['category', 'analysis', 'priority']
-          }
-        }
-      });
       return JSON.parse(response.text || '{}');
-    } catch (error) {
-      console.error("Suggestion Analysis Error:", error);
-      return { category: 'general', analysis: 'تعذر التحليل في الوقت الحالي.', priority: 'medium' };
+    } catch (e) {
+      return { category: 'عام', analysis: response.text, priority: 'medium' };
     }
-  },
-
-  // تحليل عمليات البحث غير الناجحة
-  async analyzeSearchQuery(query: string) {
-    try {
-      const ai = await getAIProvider();
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `المستخدم بحث عن "${query}" ولم يجد نتائج. قدم تفسيراً ذكياً وفخماً يعزز الثقة بالمنصة ويعد بميزات مستقبلية سيادية.`,
-      });
-      return response.text || "نحن نعمل على توسيع أفق فليكسو السيادي لضم هذه النتائج مستقبلاً.";
-    } catch (error) {
-      return "جرب البحث بمفردات أكثر سيادية يا ركن.";
-    }
-  },
-
-  // توليد فيديو سيادي باستخدام Veo
-  async generateSovereignVideo(prompt: string, aspectRatio: '16:9' | '9:16' = '9:16') {
-    try {
-      const ai = await getAIProvider();
-      let operation = await ai.models.generateVideos({
-        model: 'veo-3.1-fast-generate-preview',
-        prompt: `A high-quality, world-class video for FLIXO platform: ${prompt}`,
-        config: { numberOfVideos: 1, resolution: '720p', aspectRatio: aspectRatio }
-      });
-      while (!operation.done) {
-        await new Promise(resolve => setTimeout(resolve, 10000));
-        operation = await ai.operations.getVideosOperation({ operation: operation });
-      }
-      const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
-      if (downloadLink) {
-        const response = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
-        const blob = await response.blob();
-        return URL.createObjectURL(blob);
-      }
-      return null;
-    } catch (error) { throw error; }
   }
 };
