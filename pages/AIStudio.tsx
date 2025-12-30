@@ -1,141 +1,158 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Brain, ChevronLeft, Code2, Lock, Coins, Github, Globe, CheckCircle2, CloudLightning, ArrowUpRight, Terminal, FileCode, FolderTree, Sparkles, Wand2, Lightbulb, Zap, AlertCircle, Wrench, RefreshCcw, Cloud, ShieldCheck, Activity, Bug, SearchCode, Database, Camera } from 'lucide-react';
+import { Send, Brain, ChevronLeft, Zap, Camera, Server, Activity, ShieldCheck, Terminal, Settings, Cpu, Layers, Loader2, Code, Database, Search } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import { useNavigate } from 'react-router-dom';
 
-interface FileSim {
-  id: string;
-  name: string;
-  type: 'file' | 'folder';
-  status: 'ready' | 'generating' | 'locked';
-  buildRatio: number; 
-  errorRate: number;
-  errorCode?: string;
-}
-
 const AIStudio: React.FC = () => {
   const navigate = useNavigate();
-  const [view, setView] = useState<'chat' | 'build' | 'deploy'>('chat');
-  const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string, type?: 'text' | 'action' }[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [fixingFile, setFixingFile] = useState<string | null>(null);
+  const [logs, setLogs] = useState<string[]>(["Kernel initialized...", "Establishing sovereign link...", "Ready for execution."]);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [projectFiles, setProjectFiles] = useState<FileSim[]>([
-    { id: '1', name: 'src/components', type: 'folder', status: 'ready', buildRatio: 95, errorRate: 5, errorCode: '0xFC02' },
-    { id: '2', name: 'App.tsx', type: 'file', status: 'ready', buildRatio: 82, errorRate: 18, errorCode: '0xER404' },
-    { id: '3', name: 'SovereignEngine.ts', type: 'file', status: 'ready', buildRatio: 100, errorRate: 0 },
-  ]);
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, logs]);
 
-  const handleVisionAnalysis = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsTyping(true);
-    setView('chat');
-    setMessages(prev => [...prev, { role: 'user', text: "جاري تحليل لقطة شاشة الخطأ..." }]);
-
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = (reader.result as string).split(',')[1];
-      try {
-        const result = await geminiService.analyzeErrorCode(base64, "حلل هذا الخطأ البرمجي في فليكسو.");
-        setMessages(prev => [...prev, { role: 'model', text: result }]);
-      } catch (err) {
-        setMessages(prev => [...prev, { role: 'model', text: "فشل تحليل الرؤية البرمجية." }]);
-      } finally {
-        setIsTyping(false);
-      }
-    };
-    reader.readAsDataURL(file);
+  const addLog = (log: string) => {
+    setLogs(prev => [...prev.slice(-10), `[${new Date().toLocaleTimeString()}] ${log}`]);
   };
 
-  const handleAutoFix = async (file: FileSim) => {
-    setFixingFile(file.id);
+  const handleSend = async () => {
+    if (!input.trim() || isTyping) return;
+    const userText = input;
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text: userText }]);
     setIsTyping(true);
-    try {
-      const fixResult = await geminiService.fixRepositoryErrors(file.name, file.errorRate);
-      setMessages(prev => [...prev, { role: 'model', text: `تم إصلاح ${file.name} بنجاح. الحل: ${fixResult}` }]);
-      setProjectFiles(prev => prev.map(f => f.id === file.id ? { ...f, buildRatio: 100, errorRate: 0, errorCode: undefined } : f));
-    } catch (err) {
-      alert("فشل بروتوكول الإصلاح.");
-    } finally {
-      setFixingFile(null);
-      setIsTyping(false);
-      setView('chat');
+    addLog(`Command issued: ${userText.substring(0, 20)}...`);
+
+    let fullResponse = "";
+    const stream = geminiService.askExpertStream(userText);
+    setMessages(prev => [...prev, { role: 'model', text: '' }]);
+
+    for await (const chunk of stream) {
+      fullResponse += chunk;
+      setMessages(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1].text = fullResponse;
+        return updated;
+      });
     }
+    setIsTyping(false);
+    addLog("Execution complete.");
   };
 
   return (
-    <div className="h-full bg-[#050505] text-white flex flex-col" dir="rtl">
-      {/* Header */}
-      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/60 backdrop-blur-xl sticky top-0 z-50">
-        <div className="flex items-center space-x-4 space-x-reverse">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/10 rounded-xl"><ChevronLeft size={20} /></button>
-          <div>
-            <h1 className="text-xl font-black italic tracking-tighter">AI <span className="text-indigo-500">STUDIO</span></h1>
-            <p className="text-[9px] text-indigo-400 font-bold uppercase tracking-[0.3em]">Vision Code Analysis Active</p>
-          </div>
+    <div className="h-full bg-[#050208] text-white flex flex-col md:flex-row overflow-hidden" dir="rtl">
+      {/* Right Sidebar: Terminal Logs */}
+      <div className="hidden md:flex w-72 border-l border-white/5 bg-black/40 flex-col p-4 shrink-0 font-mono">
+        <div className="flex items-center space-x-2 space-x-reverse mb-6 border-b border-white/5 pb-4">
+           <Terminal size={14} className="text-indigo-400" />
+           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Live Kernel Logs</span>
         </div>
-        <div className="flex bg-white/5 p-1 rounded-xl">
-          {['chat', 'build', 'deploy'].map((v) => (
-            <button key={v} onClick={() => setView(v as any)} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${view === v ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-500'}`}>
-              {v === 'chat' ? 'المحلل' : v === 'build' ? 'المستودع' : 'النشر'}
-            </button>
-          ))}
+        <div className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
+           {logs.map((log, i) => (
+             <div key={i} className="text-[9px] text-gray-500 animate-fade-in break-words">
+                <span className="text-indigo-500/50 mr-1">>>></span> {log}
+             </div>
+           ))}
+        </div>
+        <div className="mt-4 pt-4 border-t border-white/5">
+           <div className="flex items-center justify-between mb-2">
+              <span className="text-[8px] font-black uppercase text-gray-600">CPU LOAD</span>
+              <span className="text-[8px] font-black text-indigo-500">24%</span>
+           </div>
+           <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-indigo-500 w-[24%] animate-pulse"></div>
+           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden flex flex-col">
-        {view === 'chat' && (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar">
-               {messages.map((m, i) => (
-                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-start' : 'justify-end'}`}>
-                    <div className={`max-w-[85%] p-4 rounded-3xl text-xs font-bold ${m.role === 'user' ? 'bg-white/5 border border-white/10' : 'bg-indigo-600/20 border border-indigo-500/30'}`}>
-                      {m.text}
-                    </div>
-                 </div>
-               ))}
-               {isTyping && <div className="text-[10px] text-indigo-400 animate-pulse italic">جاري التفكير البرمجي...</div>}
-            </div>
-            <div className="p-4 bg-black/80 border-t border-white/10 flex items-center space-x-2 space-x-reverse">
-               <button onClick={() => fileInputRef.current?.click()} className="p-4 bg-white/5 border border-white/10 rounded-2xl text-gray-400 hover:text-indigo-400 transition-all">
-                  <Camera size={20} />
-               </button>
-               <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="أمر برمجي ذكي..." className="flex-1 bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm outline-none focus:border-indigo-500" />
-               <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleVisionAnalysis} />
+      {/* Main Command Center */}
+      <div className="flex-1 flex flex-col relative">
+        <div className="p-6 border-b border-white/5 bg-black/60 backdrop-blur-3xl flex items-center justify-between z-20">
+          <div className="flex items-center space-x-4 space-x-reverse">
+            <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/10 rounded-xl transition-all active:scale-90"><ChevronLeft size={24} /></button>
+            <div className="flex items-center space-x-3 space-x-reverse">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <Cpu size={24} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black italic">نواة التنفيذ <span className="text-indigo-400 text-sm uppercase">Command</span></h1>
+                <p className="text-[8px] text-gray-500 font-black uppercase tracking-[0.4em]">Sovereign Operational Interface</p>
+              </div>
             </div>
           </div>
-        )}
+          <div className="flex items-center space-x-2 space-x-reverse">
+             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+             <span className="text-[9px] font-black uppercase text-green-500">Stable Node</span>
+          </div>
+        </div>
 
-        {view === 'build' && (
-          <div className="flex-1 p-6 space-y-4 overflow-y-auto">
-             {projectFiles.map(file => (
-               <div key={file.id} className="p-5 bg-white/5 border border-white/5 rounded-[30px] flex items-center justify-between group">
-                  <div className="flex items-center space-x-4 space-x-reverse">
-                     <div className="p-3 bg-white/5 rounded-2xl">
-                        {file.type === 'folder' ? <FolderTree size={18} className="text-indigo-400" /> : <FileCode size={18} className="text-gray-400" />}
-                     </div>
-                     <div>
-                        <span className="block text-xs font-black text-white">{file.name}</span>
-                        {file.errorCode && <span className="text-[10px] text-red-500 font-mono">Bug: {file.errorCode}</span>}
-                     </div>
-                  </div>
-                  <button 
-                    onClick={() => handleAutoFix(file)}
-                    disabled={fixingFile === file.id || file.errorRate === 0}
-                    className={`p-3 rounded-2xl transition-all ${file.errorRate > 0 ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white shadow-lg' : 'bg-green-500/10 text-green-500'}`}
-                  >
-                    {fixingFile === file.id ? <RefreshCcw size={16} className="animate-spin" /> : file.errorRate > 0 ? <Wrench size={16} /> : <CheckCircle2 size={16} />}
-                  </button>
-               </div>
-             ))}
-          </div>
-        )}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar pb-40">
+           {messages.length === 0 && (
+             <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-30">
+                <Layers size={80} className="text-indigo-500 animate-bounce" />
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black italic">مركز القيادة الرقمية</h3>
+                  <p className="text-[10px] font-bold max-w-xs mx-auto uppercase tracking-widest leading-loose">أهلاً بك يا سيادة المدير خالد المنتصر. النواة جاهزة لتلقي أوامرك التنفيذية.</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
+                   <button onClick={() => setInput("فحص أمان النظام...")} className="p-3 bg-white/5 border border-white/10 rounded-2xl text-[9px] font-black uppercase hover:bg-indigo-500/10 transition-all">SYSTEM AUDIT</button>
+                   <button onClick={() => setInput("توليد تقرير أداء...")} className="p-3 bg-white/5 border border-white/10 rounded-2xl text-[9px] font-black uppercase hover:bg-indigo-500/10 transition-all">PERFORMANCE REPORT</button>
+                </div>
+             </div>
+           )}
+
+           {messages.map((m, i) => (
+             <div key={i} className={`flex ${m.role === 'user' ? 'justify-start' : 'justify-end'} animate-fade-in`}>
+                <div className={`max-w-[85%] p-6 rounded-[35px] ${
+                  m.role === 'user' ? 'bg-white/5 border border-white/10' : 'bg-[#1a1a2e]/60 backdrop-blur-xl border border-indigo-500/20 shadow-xl'
+                }`}>
+                   <div className="flex items-center space-x-2 space-x-reverse mb-3">
+                      {m.role === 'user' ? <Search size={14} className="text-gray-500" /> : <Code size={14} className="text-indigo-400" />}
+                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{m.role === 'user' ? 'Input Command' : 'Kernel Output'}</span>
+                   </div>
+                   <p className="text-[13px] leading-relaxed font-medium whitespace-pre-wrap text-indigo-50">{m.text}</p>
+                </div>
+             </div>
+           ))}
+           {isTyping && (
+             <div className="flex justify-end">
+                <div className="flex items-center space-x-3 space-x-reverse text-indigo-400 px-6 py-4 bg-indigo-600/5 rounded-full border border-indigo-500/20 shadow-inner">
+                   <Loader2 size={16} className="animate-spin" />
+                   <span className="text-[11px] font-black italic animate-pulse">جاري معالجة البيانات السيادية...</span>
+                </div>
+             </div>
+           )}
+        </div>
+
+        {/* Console-style Input */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#050208] to-transparent">
+           <div className="max-w-4xl mx-auto flex items-center space-x-4 space-x-reverse bg-black/60 backdrop-blur-3xl border border-white/10 p-2 rounded-[2.5rem] shadow-2xl">
+              <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-indigo-400">
+                 <Terminal size={20} />
+              </div>
+              <input 
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                placeholder="أدخل أمراً برمجياً أو استفساراً للنواة..."
+                className="flex-1 bg-transparent border-none focus:outline-none px-4 text-sm text-white placeholder:text-gray-600 font-mono"
+              />
+              <button 
+                onClick={handleSend}
+                disabled={!input.trim() || isTyping}
+                className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${input.trim() ? 'bg-indigo-600 text-white shadow-lg scale-110 rotate-[-45deg]' : 'bg-white/5 text-gray-600'}`}
+              >
+                <Send size={20} />
+              </button>
+           </div>
+        </div>
       </div>
     </div>
   );

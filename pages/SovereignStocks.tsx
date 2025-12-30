@@ -1,13 +1,16 @@
 
-import React, { useState } from 'react';
-import { BarChart4, TrendingUp, ArrowUpRight, ArrowDownRight, Info, ChevronLeft, Coins, Globe, Target } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BarChart4, TrendingUp, ArrowUpRight, ArrowDownRight, Info, ChevronLeft, Coins, Globe, Target, Sparkles, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { geminiService } from '../services/geminiService';
 
 const SovereignStocks: React.FC = () => {
   const navigate = useNavigate();
   const [sharePrice, setSharePrice] = useState(125.40);
   const [userShares, setUserShares] = useState(10);
   const [isBuying, setIsBuying] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
 
   const stats = [
     { label: 'دخل جوجل السنوي', val: '$1.2B', icon: <Globe size={14} className="text-blue-400" /> },
@@ -23,6 +26,17 @@ const SovereignStocks: React.FC = () => {
     }, 1500);
   };
 
+  const fetchAiInsight = async () => {
+    setIsAnalyzing(true);
+    const insight = await geminiService.generateStockInsight(userShares);
+    setAiInsight(insight);
+    setIsAnalyzing(false);
+  };
+
+  useEffect(() => {
+    fetchAiInsight();
+  }, [userShares]);
+
   return (
     <div className="h-full bg-black text-white flex flex-col overflow-y-auto pb-32 no-scrollbar" dir="rtl">
       <div className="p-8 pt-16 border-b border-white/5 bg-gradient-to-b from-green-900/20 to-transparent">
@@ -35,7 +49,17 @@ const SovereignStocks: React.FC = () => {
           <div className="p-3 bg-green-500/10 rounded-2xl border border-green-500/20"><BarChart4 size={24} className="text-green-500" /></div>
         </div>
 
-        {/* Stock Chart Mockup */}
+        {/* AI Insight Section */}
+        {aiInsight && (
+          <div className="mb-8 p-6 bg-indigo-600/10 border border-indigo-500/20 rounded-[35px] animate-slide-up">
+            <div className="flex items-center space-x-2 space-x-reverse text-indigo-400 mb-3">
+               <Sparkles size={16} />
+               <span className="text-[10px] font-black uppercase tracking-widest">تحليل النواة السيادية</span>
+            </div>
+            <p className="text-xs text-indigo-100 font-bold italic leading-relaxed">{aiInsight}</p>
+          </div>
+        )}
+
         <div className="bg-white/5 border border-white/10 rounded-[40px] p-8 mb-8 relative overflow-hidden">
            <div className="flex justify-between items-end mb-8">
               <div>
@@ -65,15 +89,16 @@ const SovereignStocks: React.FC = () => {
            </div>
         </div>
 
-        {/* Actions */}
         <div className="grid grid-cols-2 gap-4">
            <button 
              onClick={handleBuy}
              className="py-5 bg-green-600 text-white rounded-[25px] font-black text-sm shadow-[0_20px_40px_rgba(22,163,74,0.3)] active:scale-95 transition-all"
            >
-             {isBuying ? 'جاري الشراء...' : 'شراء أسهم'}
+             {isBuying ? <Loader2 className="animate-spin mx-auto" /> : 'شراء أسهم'}
            </button>
-           <button className="py-5 bg-white/5 border border-white/10 text-white rounded-[25px] font-black text-sm active:scale-95 transition-all">بيع الأسهم</button>
+           <button onClick={fetchAiInsight} className="py-5 bg-white/5 border border-white/10 text-white rounded-[25px] font-black text-sm active:scale-95 transition-all">
+             {isAnalyzing ? <Loader2 className="animate-spin mx-auto" /> : 'تحديث التحليل'}
+           </button>
         </div>
       </div>
 
@@ -93,13 +118,6 @@ const SovereignStocks: React.FC = () => {
                <span className="text-[10px] text-green-500 font-black block">أرباحك المحققة</span>
                <span className="text-sm font-black text-white">+254.10 FX</span>
             </div>
-         </div>
-
-         <div className="p-8 bg-indigo-900/10 border border-indigo-500/20 rounded-[40px] flex items-start space-x-4 space-x-reverse">
-            <Info size={20} className="text-indigo-400 mt-1" />
-            <p className="text-xs text-gray-400 leading-relaxed font-medium">
-               يتم توزيع الأرباح تلقائياً كل يوم أحد بناءً على نسبة تملكك في منصة فليكسو. الاستثمار في فليكسو هو استثمار في السيادة المستقبلية.
-            </p>
          </div>
       </div>
     </div>

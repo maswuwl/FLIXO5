@@ -22,7 +22,6 @@
             --border-color: rgba(236, 72, 153, 0.15);
         }
         
-        /* الوضع المشمس (Light Mode) */
         .light-mode {
             --bg-ethereal: #fcfcfd;
             --text-main: #050208;
@@ -41,43 +40,44 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        /* وضع المحادثة: إخفاء عناصر الواجهة الرئيسية */
+        /* Sovereign CRT Scanlines Overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            z-index: 9999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
         body.in-chat-mode header,
         body.in-chat-mode .fixed.bottom-4,
         body.in-chat-mode .fixed.bottom-20 {
             display: none !important;
         }
 
-        /* Aura Background */
         .aura-bg {
             position: fixed; inset: 0; z-index: -1;
-            background: var(--bg-ethereal);
+            background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, var(--bg-ethereal) 100%);
             overflow: hidden;
         }
 
         .glow-orb {
             position: absolute; border-radius: 50%;
-            filter: blur(80px); opacity: 0.2;
+            filter: blur(80px); opacity: 0.15;
             animation: orb-move 20s infinite alternate ease-in-out;
         }
 
-        .orb-1 { width: 200px; height: 200px; background: var(--flixo-pink); top: -50px; left: -50px; }
-        .orb-2 { width: 175px; height: 175px; background: var(--flixo-purple); bottom: -50px; right: -25px; animation-delay: -5s; }
+        .orb-1 { width: 400px; height: 400px; background: var(--flixo-pink); top: -100px; left: -100px; }
+        .orb-2 { width: 350px; height: 350px; background: var(--flixo-purple); bottom: -100px; right: -50px; animation-delay: -5s; }
+        .orb-3 { width: 300px; height: 300px; background: var(--flixo-indigo); top: 40%; left: 30%; opacity: 0.1; animation: orb-move 15s infinite alternate-reverse; }
 
         @keyframes orb-move {
-            from { transform: translate(0, 0) scale(1); }
-            to { transform: translate(50px, 25px) scale(1.3); }
+            from { transform: translate(0, 0) scale(1) rotate(0deg); }
+            to { transform: translate(100px, 50px) scale(1.5) rotate(30deg); }
         }
-
-        /* اهتزاز شعار العلامة المائية الراقص */
-        @keyframes fx-vibe {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            20% { transform: scale(1.15) rotate(-15deg); }
-            40% { transform: scale(1.15) rotate(15deg); }
-            60% { transform: scale(1.25) rotate(-10deg); }
-            80% { transform: scale(1.25) rotate(10deg); }
-        }
-        .animate-fx-vibe { animation: fx-vibe 0.5s infinite linear; }
 
         .active-tap:active { transform: scale(0.95); transition: transform 0.1s; }
 
@@ -94,12 +94,16 @@
             color: var(--text-main);
         }
 
-        .light-mode .text-white { color: #000 !important; }
-        .light-mode .text-gray-400 { color: #4b5563; }
-        .light-mode .text-gray-500 { color: #6b7280; }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
     </style>
 <script type="importmap">
 {
@@ -118,6 +122,7 @@
     <div class="aura-bg">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
     </div>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>

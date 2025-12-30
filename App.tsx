@@ -5,7 +5,6 @@ import Layout from './components/Layout';
 import { authService } from './services/authService';
 import { Loader2, Sparkles } from 'lucide-react';
 
-// التحميل الكسول للصفحات لتقليل حجم ملف الـ JS النهائي
 const Feed = lazy(() => import('./pages/Feed'));
 const Explore = lazy(() => import('./pages/Explore'));
 const Create = lazy(() => import('./pages/Create'));
@@ -30,9 +29,9 @@ const Charter = lazy(() => import('./pages/Charter'));
 const SovereignStocks = lazy(() => import('./pages/SovereignStocks'));
 const DigitalIdentity = lazy(() => import('./pages/DigitalIdentity'));
 const OverseerExpert = lazy(() => import('./pages/OverseerExpert'));
+const ExpertMind = lazy(() => import('./pages/ExpertMind')); // المسار الجديد
 const Groups = lazy(() => import('./pages/Groups'));
 
-// واجهة الانتظار السيادية أثناء تحميل الحزم البرمجية
 const SovereignLoader = () => (
   <div className="h-screen w-full bg-[#050208] flex flex-col items-center justify-center space-y-6">
     <div className="relative">
@@ -60,9 +59,7 @@ const App: React.FC = () => {
     <Router>
       <Suspense fallback={<SovereignLoader />}>
         <Routes>
-          {/* المسارات المتاحة للجميع */}
           <Route path="/charter" element={<Charter />} />
-
           {!isAuthenticated ? (
             <Route path="*" element={<Auth onLoginSuccess={handleLoginSuccess} />} />
           ) : (
@@ -88,6 +85,7 @@ const App: React.FC = () => {
                     <Route path="/identity" element={<DigitalIdentity />} />
                     <Route path="/ai-buddy" element={<AIBuddy />} />
                     <Route path="/overseer" element={<OverseerExpert />} />
+                    <Route path="/expert-mind" element={<ExpertMind />} />
                     <Route path="/blueprint" element={<Blueprint />} />
                     <Route path="/community" element={<Community />} />
                     <Route path="/ports" element={<Ports />} />

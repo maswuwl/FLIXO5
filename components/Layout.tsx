@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2, Gamepad2, Users, Languages } from 'lucide-react';
+import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2, Gamepad2, Users, Languages, LayoutPanelLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import GlobalSearch from './GlobalSearch';
@@ -15,7 +15,6 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [hasNewNotification, setHasNewNotification] = useState(true);
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
 
   useEffect(() => {
@@ -30,21 +29,20 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const menuItems = [
+    { label: 'خبير المعرفة (البناء)', icon: <Brain size={12} />, path: '/expert-mind', color: 'text-indigo-400' },
     { label: 'الخبير المشرف', icon: <Wand2 size={10} />, path: '/overseer', color: 'text-yellow-400' },
     { label: 'ساحة الألعاب', icon: <Gamepad2 size={10} />, path: '/chess', color: 'text-green-400' },
     { label: 'المجتمعات', icon: <Users size={10} />, path: '/groups', color: 'text-blue-400' },
-    { label: 'اللغة', icon: <Languages size={10} />, path: '#', color: 'text-cyan-400' },
     { label: 'المخطط السيادي', icon: <Scale size={10} />, path: '/blueprint', color: 'text-pink-400' },
     { label: 'بورصة فليكسو', icon: <TrendingUp size={10} />, path: '/stocks', color: 'text-purple-400' },
     { label: 'الهوية الضوئية', icon: <BadgeCheck size={10} />, path: '/identity', color: 'text-pink-500' },
     { label: 'غرفة الأخبار', icon: <Newspaper size={10} />, path: '/newsroom', color: 'text-red-400' },
   ];
 
-  const isInChatMode = location.pathname.includes('/inbox') || location.pathname.includes('/overseer') || location.pathname.includes('/ai-buddy');
+  const isInChatMode = location.pathname.includes('/inbox') || location.pathname.includes('/overseer') || location.pathname.includes('/ai-buddy') || location.pathname.includes('/expert-mind');
 
   return (
     <div className={`relative h-screen flex flex-col overflow-hidden bg-transparent ${isDarkMode ? 'dark' : 'light'}`} dir="rtl">
-      
       {!isInChatMode && (
         <header className="h-12 flex items-center justify-between px-3 z-[100] relative bg-black/10 backdrop-blur-md border-b border-white/5">
           <div className="flex items-center space-x-1.5 space-x-reverse">
@@ -55,18 +53,16 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
               <Radar size={12} className="animate-pulse" />
             </button>
           </div>
-          
           <div className="flex items-center space-x-1.5 space-x-reverse cursor-pointer active-tap group" onClick={() => navigate('/')}>
             <div className="w-5 h-5 bg-gradient-to-tr from-pink-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:rotate-12 transition-all">
               <span className="text-white font-black text-[10px]">FX</span>
             </div>
             <h1 className="text-lg font-black italic flixo-text-gradient tracking-tighter">FLIXO</h1>
           </div>
-
           <div className="flex items-center space-x-1.5 space-x-reverse">
             <GlobalSearch />
             <button onClick={() => navigate('/notifications')} className="w-7 h-7 glass-order4 rounded-lg flex items-center justify-center text-gray-400 active-tap">
-              <Bell size={14} className={hasNewNotification ? 'text-pink-500 animate-bounce' : ''} />
+              <Bell size={14} />
             </button>
             <div onClick={() => navigate('/profile')} className="w-7 h-7 rounded-lg border border-pink-500/20 p-0.5 cursor-pointer active-tap overflow-hidden">
               <img src={currentUser?.avatar} className="w-full h-full rounded-md object-cover shadow-sm" alt="profile" />
@@ -74,18 +70,14 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
       )}
-
-      <main className="flex-1 relative overflow-hidden">
-        {children}
-      </main>
-
+      <main className="flex-1 relative overflow-hidden">{children}</main>
       {!isInChatMode && (
         <div className="fixed bottom-20 left-4 z-[150] flex flex-col items-center">
           {isChatOpen && (
             <div className="mb-2 bg-black/80 backdrop-blur-2xl border border-pink-500/20 rounded-xl p-1.5 flex flex-col space-y-1 shadow-2xl animate-fade-in w-24">
-               <button onClick={() => navigate('/ai-buddy')} className="flex items-center space-x-1.5 space-x-reverse p-1.5 hover:bg-white/5 rounded-lg">
-                  <Cpu size={10} className="text-indigo-400" />
-                  <span className="text-[7px] font-black text-white">الخبير</span>
+               <button onClick={() => navigate('/expert-mind')} className="flex items-center space-x-1.5 space-x-reverse p-1.5 hover:bg-white/5 rounded-lg">
+                  <Brain size={10} className="text-indigo-400" />
+                  <span className="text-[7px] font-black text-white">المعرفة</span>
                </button>
                <button onClick={() => navigate('/inbox')} className="flex items-center space-x-1.5 space-x-reverse p-1.5 hover:bg-white/5 rounded-lg">
                   <MessageCircle size={10} className="text-pink-400" />
@@ -98,7 +90,6 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
           </button>
         </div>
       )}
-
       <aside className={`fixed top-0 left-0 h-full w-[240px] glass-order4 z-[120] transition-transform duration-500 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 flex flex-col h-full">
           <div className="flex justify-between items-center mb-6">
@@ -113,7 +104,6 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
             </div>
             <button onClick={() => setIsMenuOpen(false)} className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-gray-500 active:scale-90 transition-transform"><X size={14} /></button>
           </div>
-
           <nav className="space-y-1 flex-1 overflow-y-auto no-scrollbar">
             {menuItems.map((item, idx) => (
               <button key={idx} onClick={() => { if(item.path !== '#') navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-white/5 transition-all group active:scale-[0.98]">
@@ -121,27 +111,10 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
                 <span className="text-[11px] font-bold">{item.label}</span>
               </button>
             ))}
-
-            <div className="pt-4 mt-4 border-t border-white/5">
-                <button 
-                  onClick={toggleTheme}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 active-tap"
-                >
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    {isDarkMode ? <Sun size={14} className="text-yellow-500" /> : <Moon size={14} className="text-indigo-400" />}
-                    <span className="text-[11px] font-black">{isDarkMode ? 'الوضع المشمس' : 'الوضع المظلم'}</span>
-                  </div>
-                  <div className={`w-8 h-4 rounded-full relative transition-all ${isDarkMode ? 'bg-indigo-600' : 'bg-gray-400'}`}>
-                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${isDarkMode ? 'right-4.5' : 'right-0.5'}`}></div>
-                  </div>
-                </button>
-            </div>
           </nav>
-
           <button onClick={() => authService.logout()} className="mt-4 w-full py-3 rounded-xl bg-red-500/10 text-red-500 font-black text-[8px] uppercase tracking-widest active:scale-95 transition-all">تسجيل خروج آمن</button>
         </div>
       </aside>
-
       {!isInChatMode && (
         <div className="fixed bottom-4 left-0 right-0 flex justify-center z-[110] px-3">
           <nav className="h-12 glass-order4 rounded-[2rem] flex items-center justify-between px-4 shadow-2xl w-full max-w-xs border border-white/10">
@@ -152,11 +125,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
               { id: '/inbox', icon: <MessageCircle size={14} /> },
               { id: '/profile', icon: <img src={currentUser?.avatar} className="w-5 h-5 rounded-full border border-white/20 object-cover" alt="me" /> }
             ].map((item) => (
-              <button 
-                key={item.id}
-                onClick={() => navigate(item.id)}
-                className={`p-2 transition-all active:scale-90 ${item.special ? '-mt-8 bg-pink-500 text-white rounded-2xl shadow-xl border-4 border-[#050208]' : location.pathname === item.id ? 'text-pink-400' : 'text-gray-500 hover:text-white'}`}
-              >
+              <button key={item.id} onClick={() => navigate(item.id)} className={`p-2 transition-all active:scale-90 ${item.special ? '-mt-8 bg-pink-500 text-white rounded-2xl shadow-xl border-4 border-[#050208]' : location.pathname === item.id ? 'text-pink-400' : 'text-gray-500 hover:text-white'}`}>
                 {item.icon}
               </button>
             ))}

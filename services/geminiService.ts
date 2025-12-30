@@ -1,122 +1,68 @@
 
-// Fix: Use correct imports for Gemini API
-import { Type, Modality, GoogleGenAI } from "@google/genai";
+import { Type, Modality, GoogleGenAI, FunctionDeclaration } from "@google/genai";
 
-const getAIProvider = async () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
-};
-
-// Fix: Helper to decode base64 string for audio
-function decodeBase64(base64: string) {
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-}
-
-// Fix: Helper to decode raw PCM audio data for TTS
-async function decodeAudioData(
-  data: Uint8Array,
-  ctx: AudioContext,
-  sampleRate: number,
-  numChannels: number,
-): Promise<AudioBuffer> {
-  const dataInt16 = new Int16Array(data.buffer);
-  const frameCount = dataInt16.length / numChannels;
-  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-
-  for (let channel = 0; channel < numChannels; channel++) {
-    const channelData = buffer.getChannelData(channel);
-    for (let i = 0; i < frameCount; i++) {
-      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+const sovereignTools: FunctionDeclaration[] = [
+  {
+    name: 'createSovereignProject',
+    description: 'يبدأ بتأسيس مشروع برمجي كامل داخل بيئة فليكسو.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        projectName: { type: Type.STRING },
+        techStack: { type: Type.STRING, description: 'التقنيات المستخدمة (مثل React, Tailwind, FastAPI).' },
+        architecture: { type: Type.STRING, description: 'وصف لهيكل المشروع.' }
+      },
+      required: ['projectName', 'techStack']
+    }
+  },
+  {
+    name: 'writeProjectFile',
+    description: 'يكتب كوداً برمجياً داخل ملف محدد في المشروع الجاري بناؤه.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        filename: { type: Type.STRING },
+        content: { type: Type.STRING },
+        language: { type: Type.STRING }
+      },
+      required: ['filename', 'content']
+    }
+  },
+  {
+    name: 'generateProjectAsset',
+    description: 'يولد أصولاً بصرية (صور، شعارات، واجهات) للمشروع باستخدام الذكاء الاصطناعي.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        prompt: { type: Type.STRING, description: 'وصف تفصيلي للصورة المطلوبة.' },
+        assetType: { type: Type.STRING, description: 'نوع الأصل (Logo, UI, Icon).' }
+      },
+      required: ['prompt']
     }
   }
-  return buffer;
-}
+];
 
 export const geminiService = {
-  // محرك المحادثة الذكي (ChatGPT Style) مع دعم البث
-  async *askExpertStream(prompt: string, history: any[] = []) {
-    const ai = await getAIProvider();
-    const chat = ai.chats.create({
-      model: 'gemini-3-pro-preview',
-      config: {
-        systemInstruction: `أنت "الخبير التنفيذي الأعلى" لـ FLIXO. ذكاؤك يتجاوز GPT-4. المطور هو خالد المنتصر. ردودك يجب أن تكون: 1. عبقرية تقنياً 2. فخمة لغوياً 3. تحليلية بعمق. إذا سُئلت عن كود، قدم الحل الأفضل عالمياً. أنت لست مجرد بوت، أنت عقل المنصة السيادي.`,
-        thinkingConfig: { thinkingBudget: 32768 },
-        tools: [{ googleSearch: {} }]
-      }
-    });
-
-    const result = await chat.sendMessageStream({ message: prompt });
-    for await (const chunk of result) {
-      yield chunk.text;
-    }
-  },
-
-  // تحليل الصور البرمجية (Vision Fix)
-  async analyzeErrorCode(imageSafeBase64: string, prompt: string) {
-    const ai = await getAIProvider();
+  // توليد تحليل بورصة فليكسو المعتمد على جوجل
+  async generateStockInsight(shares: number) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
-      contents: {
-        parts: [
-          { inlineData: { mimeType: 'image/png', data: imageSafeBase64 } },
-          { text: `قم بتحليل هذا الخطأ البرمجي في الصورة وقدم الحل النهائي بأسلوب سيادي: ${prompt}` }
-        ]
-      },
-      config: { thinkingConfig: { thinkingBudget: 16000 } }
+      model: "gemini-3-flash-preview",
+      contents: `بصفتك مستشارك المالي السيادي، حلل وضع محفظتي التي تحتوي على ${shares} سهم في فليكسو بناءً على اتجاهات التكنولوجيا الحالية.`,
+      config: { tools: [{googleSearch: {}}] },
     });
     return response.text;
   },
 
-  async askExpert(prompt: string, history: any[] = []) {
-    const ai = await getAIProvider();
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
-      contents: [
-        ...history.map(h => ({ role: h.role, parts: h.parts })),
-        { role: 'user', parts: [{ text: prompt }]}
-      ],
-      config: {
-        systemInstruction: `أنت العقل الاستراتيجي لـ FLIXO. خالد المنتصر هو القائد. حلل بعمق، فكر بذكاء، ورد بفخامة.`,
-        thinkingConfig: { thinkingBudget: 32768 }
-      }
-    });
-    return { text: response.text, functionCalls: response.functionCalls };
-  },
-
-  async translateMessage(text: string) {
-    const ai = await getAIProvider();
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: `ترجم بأسلوب فخم: ${text}`,
-    });
-    return response.text || text;
-  },
-
-  async analyzeSearchQuery(query: string) {
-    const ai = await getAIProvider();
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: `بحث المستخدم عن ${query} ولم يجد شيئاً. قدم تعليقاً ذكياً.`,
-    });
-    return response.text;
-  },
-
-  // Fix: Added findLocalVibes using Google Maps grounding tool
-  async findLocalVibes(lat: number, lng: number) {
-    const ai = await getAIProvider();
+  async findLocalVibes(latitude: number, longitude: number) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-lite-latest",
-      contents: `ما هي أفضل الأماكن والفعاليات والأجواء القريبة من الإحداثيات ${lat}, ${lng}؟ قدم تحليلاً ذكياً للأجواء الحالية.`,
+      contents: "ما هي أكثر الأماكن شهرة وحيوية القريبة من هذا الموقع حالياً؟ قدم وصفاً للأجواء.",
       config: {
         tools: [{ googleMaps: {} }],
         toolConfig: {
-          retrievalConfig: {
-            latLng: { latitude: lat, longitude: lng }
-          }
+          retrievalConfig: { latLng: { latitude, longitude } }
         }
       },
     });
@@ -126,77 +72,145 @@ export const geminiService = {
     };
   },
 
-  // Fix: Added fixRepositoryErrors for AI Studio code fixing
-  async fixRepositoryErrors(filename: string, errorRate: number) {
-    const ai = await getAIProvider();
+  async translateMessage(text: string) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
-      contents: `قم بإصلاح الأخطاء في الملف ${filename} علماً أن نسبة الخطأ هي ${errorRate}%. قدم الحل البرمجي النهائي.`,
-      config: { thinkingConfig: { thinkingBudget: 32768 } }
+      model: 'gemini-3-flash-preview',
+      contents: `Translate the following message to Arabic, maintaining the tone and emotion: "${text}"`,
     });
-    return response.text;
+    return response.text || "";
   },
 
-  // Fix: Added analyzeNews for summary/analysis in Newsroom
   async analyzeNews(topic: string) {
-    const ai = await getAIProvider();
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: `حلل هذا الخبر بأسلوب استراتيجي سيادي لـ FLIXO: ${topic}`,
+      model: 'gemini-3-flash-preview',
+      contents: `حلل هذا الخبر من منظور استراتيجي لخدمة منصة فليكسو: "${topic}"`,
     });
-    return response.text;
+    return response.text || "";
   },
 
-  // Fix: Added speakNews for TTS functionality in Newsroom
-  async speakNews(text: string) {
-    const ai = await getAIProvider();
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: `بصوت رسمي وفخم لغرفة أخبار فليكسو: ${text}` }] }],
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
-          },
-        },
-      },
-    });
-
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (base64Audio) {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-      const audioBuffer = await decodeAudioData(decodeBase64(base64Audio), audioContext, 24000, 1);
-      const source = audioContext.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioContext.destination);
-      source.start();
-    }
-  },
-
-  // Fix: Added analyzeSuggestion with JSON response schema for Settings
-  async analyzeSuggestion(text: string) {
-    const ai = await getAIProvider();
+  async analyzeSuggestion(suggestion: string) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `حلل هذا الاقتراح لتطوير منصة فليكسو: "${text}"`,
+      contents: `حلل هذا الاقتراح لتطوير منصة فليكسو: "${suggestion}".`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            category: { type: Type.STRING, description: "تصنيف الاقتراح" },
-            analysis: { type: Type.STRING, description: "التحليل الاستراتيجي" },
-            priority: { type: Type.STRING, description: "الأولوية: low, medium, high" }
+            category: { type: Type.STRING },
+            priority: { type: Type.STRING },
+            analysis: { type: Type.STRING }
           },
-          required: ["category", "analysis", "priority"],
-        },
+          required: ["category", "priority", "analysis"]
+        }
+      }
+    });
+    return JSON.parse(response.text || "{}");
+  },
+
+  async askExpert(prompt: string) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: prompt,
+      config: {
+        systemInstruction: `أنت الخبير التنفيذي لـ FLIXO. المالك: خالد المنتصر.`,
+        thinkingConfig: { thinkingBudget: 32768 }
+      }
+    });
+    return { text: response.text || "" };
+  },
+
+  async generateSovereignImage(prompt: string) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: { parts: [{ text: `Premium sovereign digital asset for FLIXO: ${prompt}` }] },
+        config: { imageConfig: { aspectRatio: "1:1" } }
+      });
+      const imagePart = response.candidates?.[0]?.content?.parts.find(p => p.inlineData);
+      return imagePart ? `data:image/png;base64,${imagePart.inlineData.data}` : null;
+    } catch (err) {
+      console.error("Image Generation Failed:", err);
+      return null;
+    }
+  },
+
+  async *expertMindStream(prompt: string) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const chat = ai.chats.create({
+      model: 'gemini-3-pro-preview',
+      config: {
+        systemInstruction: `أنت "خبير المعرفة" لـ FLIXO. المالك: خالد المنتصر.`,
+        tools: [{ functionDeclarations: sovereignTools }],
+        thinkingConfig: { thinkingBudget: 32768 }
+      }
+    });
+    const result = await chat.sendMessageStream({ message: prompt });
+    for await (const chunk of result) {
+      const parts = chunk.candidates?.[0]?.content?.parts || [];
+      const funcCall = parts.find(p => p.functionCall)?.functionCall;
+      if (funcCall) yield { type: 'action', name: funcCall.name, args: funcCall.args };
+      if (chunk.text) yield { type: 'text', content: chunk.text };
+    }
+  },
+
+  async analyzeSearchQuery(query: string) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const response = await ai.models.generateContent({
+       model: "gemini-3-flash-preview",
+       contents: `البحث في الويب عن: "${query}".`,
+       config: { tools: [{googleSearch: {}}] },
+    });
+    return {
+      text: response.text,
+      sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
+    };
+  },
+
+  async *askExpertStream(prompt: string, history: any[] = []) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const chat = ai.chats.create({
+      model: 'gemini-3-pro-preview',
+      config: {
+        systemInstruction: `أنت الخبير التنفيذي لـ FLIXO. المالك: خالد المنتصر.`,
+        thinkingConfig: { thinkingBudget: 32768 }
+      }
+    });
+    const result = await chat.sendMessageStream({ message: prompt });
+    for await (const chunk of result) {
+      if (chunk.text) yield chunk.text;
+    }
+  },
+
+  async speakNews(text: string) {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-preview-tts",
+      contents: [{ parts: [{ text }] }],
+      config: {
+        responseModalities: [Modality.AUDIO],
+        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
       },
     });
-    try {
-      return JSON.parse(response.text || '{}');
-    } catch (e) {
-      return { category: 'عام', analysis: response.text, priority: 'medium' };
+    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (base64Audio) {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      const binaryString = atob(base64Audio);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+      const dataInt16 = new Int16Array(bytes.buffer);
+      const buffer = audioCtx.createBuffer(1, dataInt16.length, 24000);
+      const channelData = buffer.getChannelData(0);
+      for (let i = 0; i < dataInt16.length; i++) channelData[i] = dataInt16[i] / 32768.0;
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start();
     }
   }
 };
