@@ -1,139 +1,176 @@
 
-import React, { useState, useEffect } from 'react';
-import { Home, Plus, X, Brain, Wallet, ShieldCheck, Newspaper, LayoutDashboard, TrendingUp, BadgeCheck, Search, Bell, Sparkles, UserCircle, Zap, ShoppingBag, Radar, Cable, Scale, MessageCircle, Cpu, Sun, Moon, Wand2, Gamepad2, Users, Languages, LayoutPanelLeft } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { 
+  Home, Users, Play, Store, LayoutGrid, Search, Bell, MessageCircle, 
+  Menu, UserCircle, Settings, LogOut, ChevronDown, Flag, Clock, Bookmark, 
+  Calendar, CreditCard, Cpu
+} from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
-import GlobalSearch from './GlobalSearch';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
+  const user = authService.getCurrentUser();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
-  useEffect(() => {
-    const handleUpdate = () => setCurrentUser(authService.getCurrentUser());
-    window.addEventListener('userUpdate', handleUpdate);
-    return () => window.removeEventListener('userUpdate', handleUpdate);
-  }, []);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.toggle('light-mode');
-  };
-
-  const menuItems = [
-    { label: 'خبير المعرفة (البناء)', icon: <Brain size={12} />, path: '/expert-mind', color: 'text-indigo-400' },
-    { label: 'الخبير المشرف', icon: <Wand2 size={10} />, path: '/overseer', color: 'text-yellow-400' },
-    { label: 'ساحة الألعاب', icon: <Gamepad2 size={10} />, path: '/chess', color: 'text-green-400' },
-    { label: 'المجتمعات', icon: <Users size={10} />, path: '/groups', color: 'text-blue-400' },
-    { label: 'المخطط السيادي', icon: <Scale size={10} />, path: '/blueprint', color: 'text-pink-400' },
-    { label: 'بورصة فليكسو', icon: <TrendingUp size={10} />, path: '/stocks', color: 'text-purple-400' },
-    { label: 'الهوية الضوئية', icon: <BadgeCheck size={10} />, path: '/identity', color: 'text-pink-500' },
-    { label: 'غرفة الأخبار', icon: <Newspaper size={10} />, path: '/newsroom', color: 'text-red-400' },
+  const navItems = [
+    { id: '/', icon: <Home size={26} />, label: 'الرئيسية' },
+    { id: '/groups', icon: <Users size={26} />, label: 'المجموعات' },
+    { id: '/video', icon: <Play size={26} />, label: 'فيديو' },
+    { id: '/market', icon: <Store size={26} />, label: 'المتجر' },
+    { id: '/ai-studio', icon: <Cpu size={26} />, label: 'النواة' },
   ];
 
-  const isInChatMode = location.pathname.includes('/inbox') || location.pathname.includes('/overseer') || location.pathname.includes('/ai-buddy') || location.pathname.includes('/expert-mind');
-
   return (
-    <div className={`relative h-screen flex flex-col overflow-hidden bg-transparent ${isDarkMode ? 'dark' : 'light'}`} dir="rtl">
-      {!isInChatMode && (
-        <header className="h-12 flex items-center justify-between px-3 z-[100] relative bg-black/10 backdrop-blur-md border-b border-white/5">
-          <div className="flex items-center space-x-1.5 space-x-reverse">
-            <button onClick={() => setIsMenuOpen(true)} className="w-7 h-7 glass-order4 rounded-lg flex items-center justify-center active-tap">
-              <LayoutDashboard size={14} className="text-pink-400" />
-            </button>
-            <button onClick={() => navigate('/nearby')} className="w-7 h-7 glass-order4 rounded-lg flex items-center justify-center text-indigo-400 active-tap">
-              <Radar size={12} className="animate-pulse" />
-            </button>
+    <div className="h-screen bg-[#0a0a0c] text-white flex flex-col overflow-hidden" dir="rtl">
+      {/* Top Navigation Bar */}
+      <header className="h-14 bg-[#18191a] border-b border-white/5 flex items-center justify-between px-4 z-[200] shrink-0">
+        <div className="flex items-center space-x-2 space-x-reverse flex-1">
+          <div 
+            onClick={() => navigate('/')}
+            className="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer"
+          >
+            <span className="text-white font-black text-xl italic">F</span>
           </div>
-          <div className="flex items-center space-x-1.5 space-x-reverse cursor-pointer active-tap group" onClick={() => navigate('/')}>
-            <div className="w-5 h-5 bg-gradient-to-tr from-pink-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:rotate-12 transition-all">
-              <span className="text-white font-black text-[10px]">FX</span>
-            </div>
-            <h1 className="text-lg font-black italic flixo-text-gradient tracking-tighter">FLIXO</h1>
+          <div className="relative hidden md:block w-full max-w-xs">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+            <input 
+              placeholder="البحث في فليكسو..." 
+              className="w-full bg-[#3a3b3c] border-none rounded-full py-2.5 pr-10 pl-4 text-sm focus:outline-none" 
+            />
           </div>
-          <div className="flex items-center space-x-1.5 space-x-reverse">
-            <GlobalSearch />
-            <button onClick={() => navigate('/notifications')} className="w-7 h-7 glass-order4 rounded-lg flex items-center justify-center text-gray-400 active-tap">
-              <Bell size={14} />
-            </button>
-            <div onClick={() => navigate('/profile')} className="w-7 h-7 rounded-lg border border-pink-500/20 p-0.5 cursor-pointer active-tap overflow-hidden">
-              <img src={currentUser?.avatar} className="w-full h-full rounded-md object-cover shadow-sm" alt="profile" />
-            </div>
-          </div>
-        </header>
-      )}
-      <main className="flex-1 relative overflow-hidden">{children}</main>
-      {!isInChatMode && (
-        <div className="fixed bottom-20 left-4 z-[150] flex flex-col items-center">
-          {isChatOpen && (
-            <div className="mb-2 bg-black/80 backdrop-blur-2xl border border-pink-500/20 rounded-xl p-1.5 flex flex-col space-y-1 shadow-2xl animate-fade-in w-24">
-               <button onClick={() => navigate('/expert-mind')} className="flex items-center space-x-1.5 space-x-reverse p-1.5 hover:bg-white/5 rounded-lg">
-                  <Brain size={10} className="text-indigo-400" />
-                  <span className="text-[7px] font-black text-white">المعرفة</span>
-               </button>
-               <button onClick={() => navigate('/inbox')} className="flex items-center space-x-1.5 space-x-reverse p-1.5 hover:bg-white/5 rounded-lg">
-                  <MessageCircle size={10} className="text-pink-400" />
-                  <span className="text-[7px] font-black text-white">الرسائل</span>
-               </button>
-            </div>
-          )}
-          <button onClick={() => setIsChatOpen(!isChatOpen)} className="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-lg active-tap border border-white/20">
-            <MessageCircle size={14} />
-          </button>
         </div>
-      )}
-      <aside className={`fixed top-0 left-0 h-full w-[240px] glass-order4 z-[120] transition-transform duration-500 transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-4 flex flex-col h-full">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center space-x-2 space-x-reverse">
-               <div className="w-10 h-10 rounded-xl p-0.5 flixo-gradient">
-                  <img src={currentUser?.avatar} className="w-full h-full rounded-lg object-cover border border-black" alt="me" />
+
+        <nav className="hidden lg:flex items-center justify-center flex-1 space-x-2 space-x-reverse h-full">
+          {navItems.map((item) => (
+            <button 
+              key={item.id}
+              onClick={() => navigate(item.id)}
+              className={`h-full px-10 border-b-4 transition-all ${
+                location.pathname === item.id 
+                  ? 'border-indigo-500 text-indigo-500' 
+                  : 'border-transparent text-gray-400 hover:bg-white/5'
+              }`}
+            >
+              {item.icon}
+            </button>
+          ))}
+        </nav>
+
+        <div className="flex items-center justify-end space-x-2 space-x-reverse flex-1">
+          <div className="hidden md:flex items-center space-x-2 space-x-reverse ml-2 px-2 py-1 hover:bg-white/5 rounded-full cursor-pointer" onClick={() => navigate('/profile')}>
+            <img src={user?.avatar} className="w-8 h-8 rounded-full object-cover" />
+            <span className="text-sm font-bold">{user?.displayName.split(' ')[0]}</span>
+          </div>
+          {[
+            { icon: <LayoutGrid size={20} />, label: 'القائمة' },
+            { icon: <MessageCircle size={20} />, label: 'الرسائل', path: '/inbox' },
+            { icon: <Bell size={20} />, label: 'الإشعارات', path: '/notifications' }
+          ].map((btn, i) => (
+            <button 
+              key={i}
+              onClick={() => btn.path && navigate(btn.path)}
+              className="w-10 h-10 bg-[#3a3b3c] hover:bg-[#4e4f50] rounded-full flex items-center justify-center transition-colors"
+            >
+              {btn.icon}
+            </button>
+          ))}
+          <div className="relative">
+            <button 
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="w-10 h-10 bg-[#3a3b3c] hover:bg-[#4e4f50] rounded-full flex items-center justify-center"
+            >
+              <ChevronDown size={20} />
+            </button>
+            {showUserMenu && (
+              <div className="absolute left-0 mt-2 w-72 bg-[#242526] border border-white/10 rounded-xl shadow-2xl p-2 z-[300] animate-scale-in">
+                <div 
+                  className="flex items-center space-x-3 space-x-reverse p-3 hover:bg-white/5 rounded-lg cursor-pointer mb-2"
+                  onClick={() => { navigate('/profile'); setShowUserMenu(false); }}
+                >
+                  <img src={user?.avatar} className="w-12 h-12 rounded-full border border-white/10" />
+                  <div className="text-right">
+                    <p className="font-bold">{user?.displayName}</p>
+                    <p className="text-xs text-gray-400">عرض ملفك الشخصي</p>
+                  </div>
+                </div>
+                <hr className="border-white/5 my-2" />
+                <button onClick={() => navigate('/settings')} className="w-full flex items-center space-x-3 space-x-reverse p-3 hover:bg-white/5 rounded-lg">
+                  <Settings size={20} /> <span className="text-sm font-bold">الإعدادات والخصوصية</span>
+                </button>
+                <button onClick={() => authService.logout()} className="w-full flex items-center space-x-3 space-x-reverse p-3 hover:bg-white/5 rounded-lg text-red-400">
+                  <LogOut size={20} /> <span className="text-sm font-bold">تسجيل الخروج</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Sidebar (Shortcuts) */}
+        <aside className="hidden xl:flex w-72 flex-col p-2 overflow-y-auto no-scrollbar">
+          {[
+            { icon: <img src={user?.avatar} className="w-9 h-9 rounded-full object-cover" />, label: user?.displayName, path: '/profile' },
+            { icon: <Users size={24} className="text-indigo-400" />, label: 'الأصدقاء', path: '/friends' },
+            { icon: <Flag size={24} className="text-orange-500" />, label: 'الصفحات', path: '/pages' },
+            { icon: <Clock size={24} className="text-blue-400" />, label: 'الذكريات', path: '/memories' },
+            { icon: <Bookmark size={24} className="text-purple-400" />, label: 'العناصر المحفوظة', path: '/saved' },
+            { icon: <Store size={24} className="text-indigo-500" />, label: 'المتجر', path: '/market' },
+            { icon: <Play size={24} className="text-red-500" />, label: 'فيديو', path: '/video' },
+            { icon: <Calendar size={24} className="text-pink-500" />, label: 'المناسبات', path: '/events' },
+            { icon: <CreditCard size={24} className="text-green-500" />, label: 'الطلبات والمدفوعات', path: '/wallet' },
+          ].map((item, i) => (
+            <button 
+              key={i}
+              onClick={() => navigate(item.path)}
+              className="flex items-center space-x-3 space-x-reverse p-3 hover:bg-white/5 rounded-xl transition-all"
+            >
+              <div className="w-9 h-9 flex items-center justify-center">{item.icon}</div>
+              <span className="text-[14px] font-medium">{item.label}</span>
+            </button>
+          ))}
+          <hr className="border-white/5 my-4 mx-2" />
+          <p className="text-[12px] text-gray-500 px-3 font-bold">اختصاراتك السيادية</p>
+          <div className="mt-2 space-y-1">
+             {/* Dynamic shortcuts could go here */}
+          </div>
+        </aside>
+
+        {/* Feed Area */}
+        <main className="flex-1 overflow-y-auto bg-[#0a0a0c] no-scrollbar">
+          <div className="max-w-[740px] mx-auto py-6 px-4">
+            {children}
+          </div>
+        </main>
+
+        {/* Right Sidebar (Contacts) */}
+        <aside className="hidden lg:flex w-72 flex-col p-4 border-r border-white/5 overflow-y-auto no-scrollbar">
+          <div className="flex justify-between items-center mb-4">
+             <span className="text-gray-500 font-bold">جهات الاتصال</span>
+             <div className="flex space-x-2 space-x-reverse">
+                <Search size={16} className="text-gray-500 cursor-pointer" />
+                <Menu size={16} className="text-gray-500 cursor-pointer" />
+             </div>
+          </div>
+          <div className="space-y-2">
+             {/* Mock Online Friends */}
+             {[1, 2, 3, 4, 5].map(i => (
+               <div key={i} className="flex items-center space-x-3 space-x-reverse p-2 hover:bg-white/5 rounded-xl cursor-pointer">
+                  <div className="relative">
+                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=friend${i}`} className="w-9 h-9 rounded-full bg-white/10" />
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#18191a] rounded-full"></div>
+                  </div>
+                  <span className="text-sm font-medium">مبدع فليكسو {i}</span>
                </div>
-               <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-white truncate max-w-[100px]">{currentUser?.displayName}</span>
-                  <span className="text-[7px] font-black uppercase text-pink-500 tracking-widest">Sovereign Menu</span>
-               </div>
-            </div>
-            <button onClick={() => setIsMenuOpen(false)} className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-gray-500 active:scale-90 transition-transform"><X size={14} /></button>
+             ))}
           </div>
-          <nav className="space-y-1 flex-1 overflow-y-auto no-scrollbar">
-            {menuItems.map((item, idx) => (
-              <button key={idx} onClick={() => { if(item.path !== '#') navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-white/5 transition-all group active:scale-[0.98]">
-                <div className={`${item.color} p-2 bg-white/5 rounded-lg group-hover:scale-110 transition-transform`}>{item.icon}</div>
-                <span className="text-[11px] font-bold">{item.label}</span>
-              </button>
-            ))}
-          </nav>
-          <button onClick={() => authService.logout()} className="mt-4 w-full py-3 rounded-xl bg-red-500/10 text-red-500 font-black text-[8px] uppercase tracking-widest active:scale-95 transition-all">تسجيل خروج آمن</button>
-        </div>
-      </aside>
-      {!isInChatMode && (
-        <div className="fixed bottom-4 left-0 right-0 flex justify-center z-[110] px-3">
-          <nav className="h-12 glass-order4 rounded-[2rem] flex items-center justify-between px-4 shadow-2xl w-full max-w-xs border border-white/10">
-            {[
-              { id: '/', icon: <Home size={14} /> },
-              { id: '/market', icon: <ShoppingBag size={14} /> },
-              { id: '/create', icon: <Plus size={18} />, special: true },
-              { id: '/inbox', icon: <MessageCircle size={14} /> },
-              { id: '/profile', icon: <img src={currentUser?.avatar} className="w-5 h-5 rounded-full border border-white/20 object-cover" alt="me" /> }
-            ].map((item) => (
-              <button key={item.id} onClick={() => navigate(item.id)} className={`p-2 transition-all active:scale-90 ${item.special ? '-mt-8 bg-pink-500 text-white rounded-2xl shadow-xl border-4 border-[#050208]' : location.pathname === item.id ? 'text-pink-400' : 'text-gray-500 hover:text-white'}`}>
-                {item.icon}
-              </button>
-            ))}
-          </nav>
-        </div>
-      )}
+        </aside>
+      </div>
     </div>
   );
 };
 
-export default LayoutComponent;
+export default Layout;
